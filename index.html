@@ -3,114 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BPHU Live Laboratory Dashboard</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>BPHU Laboratory Test Availability Status</title>
+    <style>
+        :root {
+            --available: #10B981;
+            --unavailable: #EF4444;
+            --bg-dark: #0F172A;
+            --card-bg: #1E293B;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-dark);
+            color: #F8FAFC;
+            margin: 0;
+            padding: 20px;
+            overflow: hidden; /* Optimized to fit perfectly on a TV screen without scrolling */
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #334155;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .header h1 { margin: 0; font-size: 2.2rem; color: #38BDF8; }
+        .header h2 { margin: 5px 0 0 0; font-size: 1.4rem; color: #94A3B8; }
+        .timestamp { font-size: 1.2rem; font-weight: bold; background: #334155; padding: 10px 15px; border-radius: 8px; }
+        
+        /* 3-Column Grid for high density layout on large TV screens */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            height: 82vh;
+        }
+        .test-card {
+            background-color: var(--card-bg);
+            padding: 14px 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 6px solid #64748B;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .test-name { font-size: 1.15rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75%; }
+        .badge {
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+        .status-AVAILABLE { border-left-color: var(--available); }
+        .status-AVAILABLE .badge { background-color: rgba(16, 185, 129, 0.2); color: #34D399; }
+        
+        .status-NOT { border-left-color: var(--unavailable); animation: pulse 2s infinite; }
+        .status-NOT .badge { background-color: rgba(239, 68, 68, 0.2); color: #F87171; }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased font-sans">
+<body>
 
-    <header class="bg-[#1a365d] text-white shadow-md border-b-4 border-amber-500">
-        <div class="max-w-4xl mx-auto px-4 py-5 text-center">
-            <p class="text-xs uppercase tracking-widest text-slate-300 font-bold mb-1">National Health Mission (NHM) • UP</p>
-            <h1 class="text-xl md:text-2xl font-black">Live Laboratory Status Notice Board</h1>
-            <h2 class="text-md text-amber-400 font-medium mt-1">ब्लॉक पब्लिक हेल्थ यूनिट (BPHU) लैब लाइव स्टेटस</h2>
+    <div class="header">
+        <div>
+            <h1 id="facility-title">BPHU LABORATORY STATUS</h1>
+            <h2>National Health Mission - Uttar Pradesh</h2>
         </div>
-    </header>
+        <div class="timestamp" id="live-clock">Loading Today's Date...</div>
+    </div>
 
-    <main class="max-w-xl mx-auto px-4 py-6">
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6 flex justify-between items-center">
-            <div>
-                <p class="text-xs text-slate-500 font-bold uppercase">Current Schedule Date / आज की तिथि</p>
-                <p id="current-date" class="text-base font-extrabold text-[#1a365d]"></p>
-            </div>
-            <div class="text-right">
-                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 animate-pulse">
-                    ● Live Updated
-                </span>
-            </div>
-        </div>
-
-        <div id="test-container" class="space-y-4">
-            <div class="text-center py-10 text-slate-500 font-medium">
-                <svg class="animate-spin h-8 w-8 mx-auto mb-3 text-slate-400" viewBox="0 0 24 24" fill="none">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Fetching live lab status directory...
-            </div>
-        </div>
-    </main>
-
-    <footer class="text-center text-xs text-slate-400 py-8 max-w-xl mx-auto px-4 border-t border-slate-200 mt-10">
-        This is a live dashboard verified by the Medical Officer In-Charge (MOIC). Scan codes at facility points to refresh parameters.
-    </footer>
+    <div class="grid" id="dashboard-grid">
+        <!-- The 73 tests will automatically inject here dynamically -->
+    </div>
 
     <script>
-        // Set the active client system date 
-        const today = new Date();
-        document.getElementById('current-date').innerText = today.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        // ⚠️ PASTE YOUR COPIED GOOGLE APPS SCRIPT WEB APP URL HERE:
+        const BASE_API_URL = "https://script.google.com/macros/s/AKfycbyvVZsw4Y-b3xgkS5cT1igGI9qToj97FSc40dP93DORQJ5bw4agTNvwU2Nlyh0oZa1xUQ/exec";
 
-        // PASTE YOUR RE-DEPLOYED APPS SCRIPT WEB APP URL HERE
-        const API_URL = "https://script.google.com/macros/s/AKfycbxLpbQH4L9MA6lRwkwFqFnwVNkJ6FQ6xEnkC34jzatpf9hIyvUwA7laLkeksLpdYtNuiA/exec";
+        // Read the unique location from the browser URL bar (?facilityId=Chinhat)
+        const urlParams = new URLSearchParams(window.location.search);
+        const facilityId = urlParams.get('facilityId') || "Chinhat";
+        
+        document.getElementById('facility-title').innerText = `BPHU LAB STATUS: CHC ${facilityId.toUpperCase()}`;
 
-        async function fetchDashboardData() {
-            const container = document.getElementById('test-container');
+        async function fetchStatus() {
             try {
-                const response = await fetch(API_URL);
+                const response = await fetch(`${BASE_API_URL}?facilityId=${encodeURIComponent(facilityId)}`);
                 const data = await response.json();
                 
-                if (data.length === 0) {
-                    container.innerHTML = `
-                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-6 text-center text-amber-800 font-medium">
-                            Today's updates are currently being processed by laboratory technicians. Please scan again shortly.<br>
-                            <span class="text-xs mt-2 block font-normal text-amber-600">आज का विवरण अभी अपडेट किया जा रहा है। कृपया कुछ देर बाद पुनः स्कैन करें।</span>
-                        </div>`;
-                    return;
-                }
-
-                container.innerHTML = ""; // Clear loader widget
+                const grid = document.getElementById('dashboard-grid');
+                grid.innerHTML = ""; // Clear loader
                 
-                data.forEach(item => {
-                    // Match either "AVAILABLE" or "AVAILABLE " or "Available"
-                    const isAvail = item.status.trim().toUpperCase() === "AVAILABLE";
+                data.forEach(test => {
+                    const card = document.createElement('div');
+                    // Handle status string grouping checks cleanly
+                    const isAvailable = test.status === "AVAILABLE";
+                    card.className = `test-card ${isAvailable ? 'status-AVAILABLE' : 'status-NOT'}`;
                     
-                    // Assign explicit interface accents based on status metrics
-                    const statusBadge = isAvail 
-                        ? `<span class="bg-emerald-100 text-emerald-800 text-xs px-3 py-1 rounded-full font-black tracking-wide border border-emerald-300">AVAILABLE / चालू है</span>`
-                        : `<span class="bg-rose-100 text-rose-800 text-xs px-3 py-1 rounded-full font-black tracking-wide border border-rose-300">SUSPENDED / बंद है</span>`;
-                    
-                    const cardBorder = isAvail ? 'border-l-8 border-l-emerald-500' : 'border-l-8 border-l-rose-500';
-                    const opacityClass = isAvail ? 'bg-white' : 'bg-rose-50/50 opacity-90';
-
-                    const cardHTML = `
-                        <div class="${opacityClass} ${cardBorder} shadow-sm rounded-xl border border-slate-200 p-4 transition-all hover:shadow-md">
-                            <div class="flex justify-between items-start gap-4">
-                                <div>
-                                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">${item.testId}</span>
-                                    <h3 class="text-base font-extrabold text-slate-900 leading-tight mt-0.5">${item.testName}</h3>
-                                    <p class="text-xs text-slate-500 font-medium mt-1">Sample Collection: 09:00 AM - 01:00 PM</p>
-                                </div>
-                                <div class="shrink-0">
-                                    ${statusBadge}
-                                </div>
-                            </div>
-                        </div>`;
-                    
-                    container.innerHTML += cardHTML;
+                    card.innerHTML = `
+                        <div class="test-name">${test.testName}</div>
+                        <div class="badge">${isAvailable ? 'AVAILABLE' : 'NO STOCK'}</div>
+                    `;
+                    grid.appendChild(card);
                 });
-
+                
+                if(data.length > 0) {
+                    document.getElementById('live-clock').innerText = `Last Updated: ${data[0].updatedAt}`;
+                }
             } catch (error) {
-                console.error(error);
-                container.innerHTML = `
-                    <div class="bg-rose-50 border border-rose-200 rounded-xl p-5 text-center text-rose-800 text-sm font-semibold">
-                        System Sync Connection Error. Please verify network visibility or check Column A formatting.
-                    </div>`;
+                console.error("Data stream failed:", error);
+                document.getElementById('live-clock').innerText = "⚠️ Connection Reconnecting...";
             }
         }
 
-        // Initialize script trigger loop
-        fetchDashboardData();
-// Auto-refresh the dashboard data every 5 minutes (300,000 milliseconds)
-setInterval(fetchDashboardData, 300000);
+        // Run fetch on mount and auto-refresh every 2 minutes for constant live synchronization
+        fetchStatus();
+        setInterval(fetchStatus, 120000);
     </script>
 </body>
 </html>
