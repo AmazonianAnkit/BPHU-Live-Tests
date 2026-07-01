@@ -32,7 +32,6 @@
         .header h1 { margin: 0; font-size: 2rem; color: var(--accent); }
         .header h2 { margin: 5px 0 0 0; font-size: 1.2rem; color: #94A3B8; }
         
-        /* Unified Search & Dropdown Control Dock */
         .control-dock {
             background: var(--card-bg);
             padding: 20px;
@@ -61,11 +60,9 @@
             color: white;
             border: 2px solid #475569;
             cursor: pointer;
-            transition: 0.2s;
         }
         .selector-dropdown:focus { border-color: var(--accent); outline: none; }
         
-        /* Grid Display Structure */
         .status-header-bar {
             display: flex;
             justify-content: space-between;
@@ -89,10 +86,9 @@
             justify-content: space-between;
             align-items: center;
             border-left: 6px solid #64748B;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .test-name { font-size: 1.05rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
-        .badge { padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; letter-spacing: 0.5px; }
+        .badge { padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
         
         .status-AVAILABLE { border-left-color: var(--available); }
         .status-AVAILABLE .badge { background-color: rgba(16, 185, 129, 0.2); color: #34D399; }
@@ -121,23 +117,23 @@
             <h2>National Health Mission — Uttar Pradesh</h2>
         </div>
 
-        <!-- Single Central Search Hub Point -->
         <div class="control-dock">
             <label for="lab-selector" class="search-title">🔍 Search or Select Your Local Block Laboratory:</label>
             <select id="lab-selector" class="selector-dropdown" onchange="loadFacilityData()">
                 <option value="">-- Click to choose or search laboratory --</option>
-                <option value="Chinhat">CHC Chinhat</option>
-                <option value="Mohanlalganj">CHC Mohanlalganj</option>
-                <option value="Gosainganj">CHC Gosainganj</option>
-                <option value="Mall">CHC Mall</option>
-                <option value="Malihabad">CHC Malihabad</option>
-                <option value="Kakori">CHC Kakori</option>
-                <option value="Bakshi-ka-talab">CHC Bakshi Ka Talab</option>
-                <option value="Itunja">CHC Itunja</option>
+                <optgroup label="District: Lucknow">
+                    <option value="Chinhat">CHC Chinhat</option>
+                    <option value="Mohanlalganj">CHC Mohanlalganj</option>
+                    <option value="Gosainganj">CHC Gosainganj</option>
+                    <option value="Mall">CHC Mall</option>
+                    <option value="Malihabad">CHC Malihabad</option>
+                    <option value="Kakori">CHC Kakori</option>
+                    <option value="Bakshi-ka-talab">CHC Bakshi Ka Talab</option>
+                    <option value="Itunja">CHC Itunja</option>
+                </optgroup>
             </select>
         </div>
 
-        <!-- Real-time Live Result Module Container -->
         <div id="results-wrapper">
             <div class="status-header-bar hidden" id="status-header">
                 <div class="status-title" id="display-facility-name">Laboratory Status Board</div>
@@ -151,7 +147,6 @@
     </div>
 
     <script>
-        // ⚠️ PASTE YOUR GOOGLE COPIED APPS SCRIPT WEB APP URL HERE:
         const BASE_API_URL = "https://script.google.com/macros/s/AKfycbyvVZsw4Y-b3xgkS5cT1igGI9qToj97FSc40dP93DORQJ5bw4agTNvwU2Nlyh0oZa1xUQ/exec";
         
         let autoRefreshInterval = null;
@@ -162,7 +157,6 @@
             const header = document.getElementById('status-header');
             const placeholder = document.getElementById('status-placeholder');
 
-            // Clear previous loops if switching labs mid-session
             if (autoRefreshInterval) clearInterval(autoRefreshInterval);
 
             if (!selectedLab) {
@@ -172,16 +166,15 @@
                 return;
             }
 
-            // Remove placeholder text and display loader status frame
             if (placeholder) placeholder.remove();
             header.classList.remove('hidden');
-            document.getElementById('display-facility-name').innerText = `Live Status: CHC ${selectedLab.toUpperCase()}`;
+            
+            // Hardcoded Lucknow district tracking header output
+            document.getElementById('display-facility-name').innerHTML = `Live Status: <span style="color: #94A3B8; font-weight:normal;">Dist. Lucknow &rarr;</span> CHC ${selectedLab.toUpperCase()}`;
             document.getElementById('live-clock').innerText = "Fetching real-time inventory counters...";
 
-            // Execute immediate data pull
             fetchStatus(selectedLab);
 
-            // Establish continuous 2-minute refresh loop specifically for the chosen facility
             autoRefreshInterval = setInterval(() => {
                 fetchStatus(selectedLab);
             }, 120000);
@@ -193,7 +186,7 @@
                 const response = await fetch(`${BASE_API_URL}?facilityId=${encodeURIComponent(facilityId)}`);
                 const data = await response.json();
                 
-                grid.innerHTML = ""; // Wipe active entries
+                grid.innerHTML = ""; 
                 
                 data.forEach(test => {
                     const card = document.createElement('div');
