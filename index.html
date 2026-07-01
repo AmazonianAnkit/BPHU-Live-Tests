@@ -34,13 +34,13 @@
         
         .control-dock {
             background: var(--card-bg);
-            padding: 20px;
+            padding: 24px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
             margin-bottom: 25px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             align-items: center;
         }
         .search-title {
@@ -49,6 +49,17 @@
             color: #CBD5E1;
             margin: 0;
             text-align: center;
+        }
+        .district-badge {
+            background-color: #334155;
+            color: var(--accent);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            border: 1px solid #475569;
+            margin-bottom: 4px;
         }
         .selector-dropdown {
             width: 100%;
@@ -119,18 +130,19 @@
 
         <div class="control-dock">
             <label for="lab-selector" class="search-title">🔍 Search or Select Your Local Block Laboratory:</label>
+            <!-- Visually prominent District Tracker right above the dropdown layout box -->
+            <div class="district-badge">DISTRICT: LUCKNOW</div>
+            
             <select id="lab-selector" class="selector-dropdown" onchange="loadFacilityData()">
                 <option value="">-- Click to choose or search laboratory --</option>
-                <optgroup label="District: Lucknow">
-                    <option value="Chinhat">CHC Chinhat</option>
-                    <option value="Mohanlalganj">CHC Mohanlalganj</option>
-                    <option value="Gosainganj">CHC Gosainganj</option>
-                    <option value="Mall">CHC Mall</option>
-                    <option value="Malihabad">CHC Malihabad</option>
-                    <option value="Kakori">CHC Kakori</option>
-                    <option value="Bakshi-ka-talab">CHC Bakshi Ka Talab</option>
-                    <option value="Itunja">CHC Itunja</option>
-                </optgroup>
+                <option value="Chinhat">CHC Chinhat</option>
+                <option value="Mohanlalganj">CHC Mohanlalganj</option>
+                <option value="Gosainganj">CHC Gosainganj</option>
+                <option value="Mall">CHC Mall</option>
+                <option value="Malihabad">CHC Malihabad</option>
+                <option value="Kakori">CHC Kakori</option>
+                <option value="Bakshi-ka-talab">CHC Bakshi Ka Talab</option>
+                <option value="Itunja">CHC Itunja</option>
             </select>
         </div>
 
@@ -169,7 +181,6 @@
             if (placeholder) placeholder.remove();
             header.classList.remove('hidden');
             
-            // Hardcoded Lucknow district tracking header output
             document.getElementById('display-facility-name').innerHTML = `Live Status: <span style="color: #94A3B8; font-weight:normal;">Dist. Lucknow &rarr;</span> CHC ${selectedLab.toUpperCase()}`;
             document.getElementById('live-clock').innerText = "Fetching real-time inventory counters...";
 
