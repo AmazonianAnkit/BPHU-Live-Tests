@@ -3,40 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BPHU Laboratory Test Availability Status</title>
+    <title>BPHU Laboratory Status Network Portal</title>
     <style>
         :root {
             --available: #10B981;
             --unavailable: #EF4444;
             --bg-dark: #0F172A;
             --card-bg: #1E293B;
+            --accent: #38BDF8;
         }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-dark);
             color: #F8FAFC;
             margin: 0;
-            padding: 20px;
-            overflow: hidden; /* Optimized to fit perfectly on a TV screen without scrolling */
+            padding: 16px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
         }
         .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            text-align: center;
             border-bottom: 3px solid #334155;
             padding-bottom: 15px;
             margin-bottom: 20px;
         }
-        .header h1 { margin: 0; font-size: 2.2rem; color: #38BDF8; }
-        .header h2 { margin: 5px 0 0 0; font-size: 1.4rem; color: #94A3B8; }
-        .timestamp { font-size: 1.2rem; font-weight: bold; background: #334155; padding: 10px 15px; border-radius: 8px; }
+        .header h1 { margin: 0; font-size: 2rem; color: var(--accent); }
+        .header h2 { margin: 5px 0 0 0; font-size: 1.2rem; color: #94A3B8; }
         
-        /* 3-Column Grid for high density layout on large TV screens */
+        /* Unified Search & Dropdown Control Dock */
+        .control-dock {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+        }
+        .search-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #CBD5E1;
+            margin: 0;
+            text-align: center;
+        }
+        .selector-dropdown {
+            width: 100%;
+            max-width: 500px;
+            padding: 14px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            background: var(--bg-dark);
+            color: white;
+            border: 2px solid #475569;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .selector-dropdown:focus { border-color: var(--accent); outline: none; }
+        
+        /* Grid Display Structure */
+        .status-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 0 5px;
+        }
+        .status-title { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
+        .timestamp { font-size: 0.95rem; background: #334155; padding: 6px 12px; border-radius: 6px; font-weight: 600; }
+        
         .grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 12px;
-            height: 82vh;
         }
         .test-card {
             background-color: var(--card-bg);
@@ -46,64 +89,114 @@
             justify-content: space-between;
             align-items: center;
             border-left: 6px solid #64748B;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .test-name { font-size: 1.15rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 75%; }
-        .badge {
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.9rem;
-            letter-spacing: 0.5px;
-        }
+        .test-name { font-size: 1.05rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
+        .badge { padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; letter-spacing: 0.5px; }
+        
         .status-AVAILABLE { border-left-color: var(--available); }
         .status-AVAILABLE .badge { background-color: rgba(16, 185, 129, 0.2); color: #34D399; }
         
         .status-NOT { border-left-color: var(--unavailable); animation: pulse 2s infinite; }
         .status-NOT .badge { background-color: rgba(239, 68, 68, 0.2); color: #F87171; }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
+        .placeholder-text {
+            text-align: center;
+            color: #64748B;
+            font-size: 1.2rem;
+            margin-top: 60px;
+            grid-column: 1 / -1;
+            font-style: italic;
         }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <div>
-            <h1 id="facility-title">BPHU LABORATORY STATUS</h1>
-            <h2>National Health Mission - Uttar Pradesh</h2>
+    <div class="container">
+        <div class="header">
+            <h1>BPHU Laboratory Status Portal</h1>
+            <h2>National Health Mission — Uttar Pradesh</h2>
         </div>
-        <div class="timestamp" id="live-clock">Loading Today's Date...</div>
-    </div>
 
-    <div class="grid" id="dashboard-grid">
-        <!-- The 73 tests will automatically inject here dynamically -->
+        <!-- Single Central Search Hub Point -->
+        <div class="control-dock">
+            <label for="lab-selector" class="search-title">🔍 Search or Select Your Local Block Laboratory:</label>
+            <select id="lab-selector" class="selector-dropdown" onchange="loadFacilityData()">
+                <option value="">-- Click to choose or search laboratory --</option>
+                <option value="Chinhat">CHC Chinhat</option>
+                <option value="Mohanlalganj">CHC Mohanlalganj</option>
+                <option value="Gosainganj">CHC Gosainganj</option>
+                <option value="Mall">CHC Mall</option>
+                <option value="Malihabad">CHC Malihabad</option>
+                <option value="Kakori">CHC Kakori</option>
+                <option value="Bakshi-ka-talab">CHC Bakshi Ka Talab</option>
+                <option value="Itunja">CHC Itunja</option>
+            </select>
+        </div>
+
+        <!-- Real-time Live Result Module Container -->
+        <div id="results-wrapper">
+            <div class="status-header-bar hidden" id="status-header">
+                <div class="status-title" id="display-facility-name">Laboratory Status Board</div>
+                <div class="timestamp" id="live-clock">Syncing...</div>
+            </div>
+
+            <div class="grid" id="dashboard-grid">
+                <div class="placeholder-text" id="status-placeholder">Please select a health facility from the list above to verify current test availability.</div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // ⚠️ PASTE YOUR COPIED GOOGLE APPS SCRIPT WEB APP URL HERE:
-        const BASE_API_URL = "https://script.google.com/macros/s/AKfycbyvVZsw4Y-b3xgkS5cT1igGI9qToj97FSc40dP93DORQJ5bw4agTNvwU2Nlyh0oZa1xUQ/exec";
-
-        // Read the unique location from the browser URL bar (?facilityId=Chinhat)
-        const urlParams = new URLSearchParams(window.location.search);
-        const facilityId = urlParams.get('facilityId') || "Chinhat";
+        // ⚠️ PASTE YOUR GOOGLE COPIED APPS SCRIPT WEB APP URL HERE:
+        const BASE_API_URL = "YOUR_COPIED_APPS_SCRIPT_URL_HERE";
         
-        document.getElementById('facility-title').innerText = `BPHU LAB STATUS: CHC ${facilityId.toUpperCase()}`;
+        let autoRefreshInterval = null;
 
-        async function fetchStatus() {
+        async function loadFacilityData() {
+            const selectedLab = document.getElementById('lab-selector').value;
+            const grid = document.getElementById('dashboard-grid');
+            const header = document.getElementById('status-header');
+            const placeholder = document.getElementById('status-placeholder');
+
+            // Clear previous loops if switching labs mid-session
+            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+
+            if (!selectedLab) {
+                header.classList.add('hidden');
+                grid.innerHTML = '';
+                grid.appendChild(placeholder);
+                return;
+            }
+
+            // Remove placeholder text and display loader status frame
+            if (placeholder) placeholder.remove();
+            header.classList.remove('hidden');
+            document.getElementById('display-facility-name').innerText = `Live Status: CHC ${selectedLab.toUpperCase()}`;
+            document.getElementById('live-clock').innerText = "Fetching real-time inventory counters...";
+
+            // Execute immediate data pull
+            fetchStatus(selectedLab);
+
+            // Establish continuous 2-minute refresh loop specifically for the chosen facility
+            autoRefreshInterval = setInterval(() => {
+                fetchStatus(selectedLab);
+            }, 120000);
+        }
+
+        async function fetchStatus(facilityId) {
+            const grid = document.getElementById('dashboard-grid');
             try {
                 const response = await fetch(`${BASE_API_URL}?facilityId=${encodeURIComponent(facilityId)}`);
                 const data = await response.json();
                 
-                const grid = document.getElementById('dashboard-grid');
-                grid.innerHTML = ""; // Clear loader
+                grid.innerHTML = ""; // Wipe active entries
                 
                 data.forEach(test => {
                     const card = document.createElement('div');
-                    // Handle status string grouping checks cleanly
                     const isAvailable = test.status === "AVAILABLE";
                     card.className = `test-card ${isAvailable ? 'status-AVAILABLE' : 'status-NOT'}`;
                     
@@ -114,18 +207,17 @@
                     grid.appendChild(card);
                 });
                 
-                if(data.length > 0) {
+                if (data.length > 0) {
                     document.getElementById('live-clock').innerText = `Last Updated: ${data[0].updatedAt}`;
+                } else {
+                    grid.innerHTML = `<div class="placeholder-text">No test records registered in spreadsheet for this block location.</div>`;
+                    document.getElementById('live-clock').innerText = "No Data Connection";
                 }
             } catch (error) {
-                console.error("Data stream failed:", error);
-                document.getElementById('live-clock').innerText = "⚠️ Connection Reconnecting...";
+                console.error("Data pipeline sync error:", error);
+                document.getElementById('live-clock').innerText = "⚠️ Network Retry Connection...";
             }
         }
-
-        // Run fetch on mount and auto-refresh every 2 minutes for constant live synchronization
-        fetchStatus();
-        setInterval(fetchStatus, 120000);
     </script>
 </body>
 </html>
