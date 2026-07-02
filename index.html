@@ -3,228 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BPHU Laboratory Status Network Portal</title>
-    <style>
-        :root {
-            --available: #10B981;
-            --unavailable: #EF4444;
-            --bg-dark: #0F172A;
-            --card-bg: #1E293B;
-            --accent: #38BDF8;
-        }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-dark);
-            color: #F8FAFC;
-            margin: 0;
-            padding: 16px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        .header {
-            text-align: center;
-            border-bottom: 3px solid #334155;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-        }
-        .header h1 { margin: 0; font-size: 2rem; color: var(--accent); }
-        .header h2 { margin: 5px 0 0 0; font-size: 1.2rem; color: #94A3B8; }
-        
-        .control-dock {
-            background: var(--card-bg);
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            margin-bottom: 25px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            align-items: center;
-        }
-        .search-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #CBD5E1;
-            margin: 0;
-            text-align: center;
-        }
-        .district-badge {
-            background-color: #334155;
-            color: var(--accent);
-            padding: 6px 16px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            border: 1px solid #475569;
-            margin-bottom: 4px;
-        }
-        .selector-dropdown {
-            width: 100%;
-            max-width: 500px;
-            padding: 14px;
-            font-size: 1.1rem;
-            border-radius: 8px;
-            background: var(--bg-dark);
-            color: white;
-            border: 2px solid #475569;
-            cursor: pointer;
-        }
-        .selector-dropdown:focus { border-color: var(--accent); outline: none; }
-        
-        .status-header-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 0 5px;
-        }
-        .status-title { font-size: 1.3rem; font-weight: bold; color: var(--accent); }
-        .timestamp { font-size: 0.95rem; background: #334155; padding: 6px 12px; border-radius: 6px; font-weight: 600; }
-        
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 12px;
-        }
-        .test-card {
-            background-color: var(--card-bg);
-            padding: 14px 20px;
-            border-radius: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 6px solid #64748B;
-        }
-        .test-name { font-size: 1.05rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%; }
-        .badge { padding: 5px 10px; border-radius: 6px; font-weight: bold; font-size: 0.85rem; }
-        
-        .status-AVAILABLE { border-left-color: var(--available); }
-        .status-AVAILABLE .badge { background-color: rgba(16, 185, 129, 0.2); color: #34D399; }
-        
-        .status-NOT { border-left-color: var(--unavailable); animation: pulse 2s infinite; }
-        .status-NOT .badge { background-color: rgba(239, 68, 68, 0.2); color: #F87171; }
-
-        .placeholder-text {
-            text-align: center;
-            color: #64748B;
-            font-size: 1.2rem;
-            margin-top: 60px;
-            grid-column: 1 / -1;
-            font-style: italic;
-        }
-
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
-        .hidden { display: none !important; }
-    </style>
+    <title>BPHU Lab Status Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 font-sans">
 
-    <div class="container">
-        <div class="header">
-            <h1>BPHU Laboratory Status Portal</h1>
-            <h2>National Health Mission — Uttar Pradesh</h2>
-        </div>
-
-        <div class="control-dock">
-            <label for="lab-selector" class="search-title">🔍 Search or Select Your Local Block Laboratory:</label>
-            <div class="district-badge">DISTRICT: LUCKNOW</div>
+    <header class="bg-blue-900 text-white shadow-md p-4">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <h1 class="text-xl font-bold tracking-wide"><i class="fa-solid fa-square-poll-vertical mr-2"></i> District Lab Monitoring Portal</h1>
             
-            <select id="lab-selector" class="selector-dropdown" onchange="loadFacilityData()">
-                <option value="">-- Click to choose or search laboratory --</option>
-                <option value="Chinhat">CHC Chinhat</option>
-                <option value="Mohanlalganj">CHC Mohanlalganj</option>
+            <select id="facilitySelector" onchange="fetchLabStatus()" class="bg-white text-slate-900 px-4 py-2 rounded-md font-medium shadow focus:outline-none focus:ring-2 focus:ring-blue-400">
+                <option value="">-- Select Lab Location --</option>
+                <option value="Bakshi-Ka-Talab">CHC Bakshi-Ka-Talab</option>
                 <option value="Gosainganj">CHC Gosainganj</option>
-                <option value="Mall">CHC Mall</option>
-                <option value="Malihabad">CHC Malihabad</option>
                 <option value="Kakori">CHC Kakori</option>
-                <option value="Bakshi Ka Talab">CHC Bakshi Ka Talab</option>
-                <option value="Itaunja">CHC Itaunja</option>
+                <option value="Sarojininagar">CHC Sarojininagar</option>
+                <option value="Chinhat">CHC Chinhat</option>
+                <option value="Malihabad">CHC Malihabad</option>
+                <option value="Mohanlalganj">CHC Mohanlalganj</option>
+                <option value="Mall">CHC Mall</option>
             </select>
         </div>
+    </header>
 
-        <div id="results-wrapper">
-            <div class="status-header-bar hidden" id="status-header">
-                <div class="status-title" id="display-facility-name">Laboratory Status Board</div>
-                <div class="timestamp" id="live-clock">Syncing...</div>
-            </div>
-
-            <div class="grid" id="dashboard-grid">
-                <div class="placeholder-text" id="status-placeholder">Please select a health facility from the list above to verify current test availability.</div>
-            </div>
+    <main class="max-w-7xl mx-auto p-4 sm:p-6">
+        
+        <div id="welcomeMessage" class="text-center py-16 bg-white rounded-xl shadow-sm border border-slate-200 my-6">
+            <i class="fa-solid fa-microscope text-6xl text-slate-300 mb-4"></i>
+            <h2 class="text-2xl font-semibold text-slate-600">Please select a BPHU Lab Location to view live metrics.</h2>
         </div>
-    </div>
+
+        <div id="dashboardContent" class="hidden animate-fade-in">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-blue-600">
+                    <p class="text-sm text-slate-500 uppercase font-bold tracking-wider">Total Sanctioned</p>
+                    <h3 class="text-3xl font-black mt-1">73</h3>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-emerald-500">
+                    <p class="text-sm text-slate-500 uppercase font-bold tracking-wider">Operational / Live</p>
+                    <h3 id="metricLive" class="text-3xl font-black text-emerald-600 mt-1">73</h3>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow-sm border-l-4 border-rose-500">
+                    <p class="text-sm text-slate-500 uppercase font-bold tracking-wider">Downtime / Suspended</p>
+                    <h3 id="metricDown" class="text-3xl font-black text-rose-600 mt-1">0</h3>
+                </div>
+            </div>
+
+            <div id="testCardsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                </div>
+        </div>
+    </main>
 
     <script>
-        // Note: Replace this URL only if your Google Apps Script Web App Deployment URL changes
-        const BASE_API_URL = "https://script.google.com/macros/s/AKfycbyrG-xaBWHXO4n0Z8EBcT1BrHqKuq0XgYmlF_vsAYQNoWq4K0oeVioVfv0oOHJfYP_-og/exec";
-        
-        let autoRefreshInterval = null;
+        // PASTE YOUR GOOGLE WEB APP DEPLOYMENT URL HERE EVERY TIME YOU REDEPLOY
+        const API_BASE_URL = "https://script.google.com/macros/s/AKfycbwuW3USBWC6StP99oAgZ7BHnnvNbBaOHVGFfJRWeeg-eKlm0UzvXQegIiFFAXkiRe6GGA/exec";
 
-        async function loadFacilityData() {
-            const selectedLab = document.getElementById('lab-selector').value;
-            const grid = document.getElementById('dashboard-grid');
-            const header = document.getElementById('status-header');
-            const placeholder = document.getElementById('status-placeholder');
+        // Master Checklist Array of 73 elements exactly matching Form/Script structures
+        const MASTER_TESTS = [
+            "Hemoglobin", "Total leucocyte count", "Differential leucocyte count", "Platelet count", "Complete blood count", "Erythrocyte sedimentation rate (ESR)", "Blood group and Rh typing, cross matching", "Peripheral blood film", "Reticulocyte count", "Absolute eosinophil count", "Bleeding time and clotting time", "Sickle cell screening test", "Sickle cell strip test", "Thalassemia screening", "DCT for Hb electrophoresis", "G6PD enzyme deficiency test", "MP slide method", "Malaria rapid test", "Prothrombin Time (PT) and INR", "Activated partial thromboplastin time (APTT)", "HCG urine test", "Urine routine test", "Urine microscopy", "Urine for microalbumin", "Urine for creatinine and ACR", "Stool for ova and cyst", "Stool for occult blood", "Dengue test", "RPR/VDRL test", "HIV test", "HBsAg test", "HCV test", "Sputum for AFB", "Typhoid test (IgM)", "Blood sugar", "Glucose tolerance test (GTT)", "Total bilirubin", "Direct & indirect bilirubin", "Serum creatinine", "Blood urea", "SGPT", "SGOT", "Alkaline phosphatase", "Total protein", "Albumin & A/G ratio", "Globulin", "Total cholesterol", "Triglycerides", "VLDL", "HDL", "LDL", "Uric acid", "HbA1c", "Serum calcium", "Wet mount & Gram stain", "Gram staining", "VIA test", "K39 for Kala Azar", "Filaria test", "TB Mantoux", "Troponin I", "CRP (Quantitative)", "Pap smear", "CBNAAT", "Rapid test for cholera", "CSF analysis", "Fluid analysis", "Amylase", "Iron", "TIBC", "LDH", "24 hr urinary protein", "Drug overdose test"
+        ];
 
-            if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+        async function fetchLabStatus() {
+            const selector = document.getElementById("facilitySelector");
+            const facilityId = selector.value;
+            
+            const welcome = document.getElementById("welcomeMessage");
+            const content = document.getElementById("dashboardContent");
+            const container = document.getElementById("testCardsContainer");
 
-            if (!selectedLab) {
-                header.classList.add('hidden');
-                grid.innerHTML = '';
-                grid.appendChild(placeholder);
+            if (!facilityId) {
+                welcome.classList.remove("hidden");
+                content.classList.add("hidden");
                 return;
             }
 
-            if (placeholder) placeholder.remove();
-            header.classList.remove('hidden');
-            
-            document.getElementById('display-facility-name').innerHTML = `Live Status: <span style="color: #94A3B8; font-weight:normal;">Dist. Lucknow &rarr;</span> CHC ${selectedLab.toUpperCase()}`;
-            document.getElementById('live-clock').innerText = "Fetching real-time inventory counters...";
+            welcome.classList.add("hidden");
+            content.classList.remove("hidden");
+            container.innerHTML = `<div class="col-span-full text-center py-12"><i class="fa-solid fa-spinner fa-spin text-4xl text-blue-900"></i><p class="mt-2 text-slate-500 font-medium">Fetching real-time downtime cache data...</p></div>`;
 
-            fetchStatus(selectedLab);
-
-            autoRefreshInterval = setInterval(() => {
-                fetchStatus(selectedLab);
-            }, 120000);
-        }
-
-        async function fetchStatus(facilityId) {
-            const grid = document.getElementById('dashboard-grid');
             try {
-                const response = await fetch(`${BASE_API_URL}?facilityId=${encodeURIComponent(facilityId)}`);
-                const data = await response.json();
+                // Fetch current exceptions from Google Deployment Apps Script API
+                const response = await fetch(`${API_BASE_URL}?facilityId=${encodeURIComponent(facilityId)}`);
+                const exceptionsMap = await response.json();
                 
-                // If the API returns an internal error log
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                
-                grid.innerHTML = ""; 
-                
-                data.forEach(test => {
-                    const card = document.createElement('div');
-                    const isAvailable = test.status === "AVAILABLE";
-                    card.className = `test-card ${isAvailable ? 'status-AVAILABLE' : 'status-NOT'}`;
+                container.innerHTML = ""; // Wipe loading spinner
+                let downCount = 0;
+
+                MASTER_TESTS.forEach(testName => {
+                    const isDown = exceptionsMap.hasOwnProperty(testName);
                     
-                    card.innerHTML = `
-                        <div class="test-name">${test.testName}</div>
-                        <div class="badge">${isAvailable ? 'AVAILABLE' : 'NO STOCK'}</div>
-                    `;
-                    grid.appendChild(card);
+                    let cardHtml = "";
+                    if (isDown) {
+                        downCount++;
+                        const data = exceptionsMap[testName];
+                        cardHtml = `
+                            <div class="bg-rose-50 border border-rose-200 rounded-xl p-4 shadow-sm flex items-start gap-3">
+                                <div class="bg-rose-500 text-white rounded-lg p-2.5 flex items-center justify-center"><i class="fa-solid fa-triangle-exclamation text-lg"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-bold text-slate-900 text-base leading-tight truncate">${testName}</h4>
+                                    <p class="text-xs font-semibold text-rose-700 tracking-wide mt-0.5 uppercase"><i class="fa-solid fa-ban mr-1"></i> Not Available / उपलब्ध नहीं</p>
+                                    <div class="mt-2 text-xs bg-white border border-rose-100 p-2 rounded text-slate-600 font-medium shadow-2xs">
+                                        <p class="text-slate-800 font-bold"><i class="fa-solid fa-circle-info mr-1 text-slate-400"></i> ${data.reasonEn}</p>
+                                        <p class="text-slate-500 mt-0.5">${data.reasonHi}</p>
+                                    </div>
+                                </div>
+                            </div>`;
+                    } else {
+                        cardHtml = `
+                            <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-start gap-3 hover:border-slate-300 transition-colors">
+                                <div class="bg-emerald-500 text-white rounded-lg p-2.5 flex items-center justify-center"><i class="fa-solid fa-circle-check text-lg"></i></div>
+                                <div class="flex-1 min-w-0">
+                                    <h4 class="font-bold text-slate-900 text-base leading-tight truncate">${testName}</h4>
+                                    <p class="text-xs font-semibold text-emerald-600 tracking-wide mt-0.5 uppercase"><i class="fa-solid fa-check mr-1"></i> Available / उपलब्ध</p>
+                                </div>
+                            </div>`;
+                    }
+                    container.insertAdjacentHTML('beforeend', cardHtml);
                 });
-                
-                if (data.length > 0) {
-                    document.getElementById('live-clock').innerText = `Last Updated: ${data[0].updatedAt}`;
-                } else {
-                    grid.innerHTML = `<div class="placeholder-text">No test records registered in spreadsheet for this block location.</div>`;
-                    document.getElementById('live-clock').innerText = "No Data Connection";
-                }
+
+                // Compute real-time metric counter displays on the top bar cards
+                document.getElementById("metricDown").innerText = downCount;
+                document.getElementById("metricLive").innerText = (73 - downCount);
+
             } catch (error) {
-                console.error("Data pipeline sync error:", error);
-                document.getElementById('live-clock').innerText = "⚠️ Network Retry Connection...";
+                container.innerHTML = `<div class="col-span-full text-center py-12 text-rose-600"><i class="fa-solid fa-circle-xmark text-4xl mb-2"></i><p class="font-bold">Failed to load connection endpoint.</p><p class="text-xs text-slate-500">${error.toString()}</p></div>`;
             }
         }
     </script>
