@@ -130,7 +130,6 @@
 
         <div class="control-dock">
             <label for="lab-selector" class="search-title">🔍 Search or Select Your Local Block Laboratory:</label>
-            <!-- Visually prominent District Tracker right above the dropdown layout box -->
             <div class="district-badge">DISTRICT: LUCKNOW</div>
             
             <select id="lab-selector" class="selector-dropdown" onchange="loadFacilityData()">
@@ -141,8 +140,8 @@
                 <option value="Mall">CHC Mall</option>
                 <option value="Malihabad">CHC Malihabad</option>
                 <option value="Kakori">CHC Kakori</option>
-                <option value="Bakshi-ka-talab">CHC Bakshi Ka Talab</option>
-                <option value="Itunja">CHC Itunja</option>
+                <option value="Bakshi Ka Talab">CHC Bakshi Ka Talab</option>
+                <option value="Itaunja">CHC Itaunja</option>
             </select>
         </div>
 
@@ -159,6 +158,7 @@
     </div>
 
     <script>
+        // Note: Replace this URL only if your Google Apps Script Web App Deployment URL changes
         const BASE_API_URL = "https://script.google.com/macros/s/AKfycbyvVZsw4Y-b3xgkS5cT1igGI9qToj97FSc40dP93DORQJ5bw4agTNvwU2Nlyh0oZa1xUQ/exec";
         
         let autoRefreshInterval = null;
@@ -196,6 +196,11 @@
             try {
                 const response = await fetch(`${BASE_API_URL}?facilityId=${encodeURIComponent(facilityId)}`);
                 const data = await response.json();
+                
+                // If the API returns an internal error log
+                if (data.error) {
+                    throw new Error(data.error);
+                }
                 
                 grid.innerHTML = ""; 
                 
