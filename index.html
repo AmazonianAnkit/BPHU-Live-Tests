@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Live Lab Test Availability Dashboard</title>
+  <!-- Tailwind CSS Core CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
     .hidden { display: none !important; }
@@ -11,13 +12,16 @@
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen pb-12">
 
+  <!-- Header Section -->
   <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-md px-4 py-6 text-center">
     <h1 class="text-xl md:text-2xl font-bold tracking-tight">UP Health Department / उत्तर प्रदेश स्वास्थ्य विभाग</h1>
     <p class="text-xs md:text-sm text-blue-100 mt-1 font-medium">Live Diagnostics Monitoring Portal / लाइव पैथोलॉजी जांच ट्रैकर</p>
   </header>
 
+  <!-- Main Container -->
   <main class="max-w-4xl mx-auto px-4 mt-6">
 
+    <!-- Top Banner: District Location & System Date -->
     <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 mb-6 space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
         <div>
@@ -25,12 +29,14 @@
           <h2 class="text-lg font-bold text-slate-800 flex items-center gap-1.5">📍 Lucknow / लखनऊ</h2>
         </div>
         
+        <!-- Live Calendar Date Banner -->
         <div class="bg-blue-50 border border-blue-100/60 rounded-xl px-4 py-2 text-left sm:text-right">
           <span class="text-[11px] font-bold text-blue-500 uppercase tracking-wide block">As of Today / आज की स्थिति:</span>
           <span id="dashboardLiveDate" class="text-sm font-bold text-blue-800">Loading...</span>
         </div>
       </div>
 
+      <!-- Facility Select Options Dropdown (Strict 8 Lucknow CHCs) -->
       <div>
         <label for="facilityDropdown" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Select Lab / लैबोरेटरी का चयन करें:</label>
         <select id="facilityDropdown" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-inner">
@@ -40,10 +46,24 @@
           <option value="CHC Malihabad">CHC Malihabad / सी.एच.सी. मलिहाबाद</option>
           <option value="CHC Chinhat">CHC Chinhat / सी.एच.सी. चिनहट</option>
           <option value="CHC Mohanlalganj">CHC Mohanlalganj / सी.एच.सी. मोहनलालगंज</option>
+          <option value="CHC Bakshi Ka Talab">CHC Bakshi Ka Talab / सी.एच.सी. बख्शी का तालाब (BKT)</option>
+          <option value="CHC Mal">CHC Mal / सी.एच.सी. माल</option>
+          <option value="CHC Sarojini Nagar">CHC Sarojini Nagar / सी.एच.सी. सरोजनी नगर</option>
         </select>
       </div>
     </div>
 
+    <!-- Live Counters Metric Banner -->
+    <div id="counterBanner" class="hidden flex gap-3 mb-6 font-bold text-sm">
+      <div class="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl px-4 py-3 text-center shadow-sm">
+        ✅ Available / चालू: <span id="availableCount" class="text-lg ml-1 font-black text-emerald-600">0</span>
+      </div>
+      <div class="flex-1 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl px-4 py-3 text-center shadow-sm">
+        ⚠️ Not Available / बंद: <span id="notAvailableCount" class="text-lg ml-1 font-black text-rose-600">0</span>
+      </div>
+    </div>
+
+    <!-- Smart Search Engine Input Bar -->
     <div class="relative mb-6">
       <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">🔍</span>
       <input 
@@ -55,11 +75,13 @@
       />
     </div>
 
+    <!-- Loading State Placeholder Indicator -->
     <div id="loaderState" class="hidden text-center py-12">
       <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent mb-2"></div>
       <p class="text-sm font-medium text-slate-500">Fetching live availability status from laboratory network...</p>
     </div>
 
+    <!-- Live Dual-Language Card Results Grid Layout -->
     <div id="testGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div id="initialPrompt" class="col-span-full text-center py-12 text-slate-400 font-medium bg-white rounded-2xl border border-dashed border-slate-200">
         👋 Please select a facility from the dropdown menu above to check live test availability.
@@ -67,9 +89,10 @@
     </div>
   </main>
 
+  <!-- JavaScript Interface Engine -->
   <script>
     // ⚠️ REPLACE THIS WITH YOUR ACTUAL DEPLOYED WEB APP URL
-    const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw0rT4UlqsMgbgBFChz07kG-TJl3Cw7uQWpMv4TNUzuRiE3Vrg2EP_n8RRXTfWk73iSPg/exec";
+    const APPS_SCRIPT_WEB_APP_URL = "YOUR_DEPLOYED_WEB_APP_URL_HERE";
 
     // 73 Core Master Diagnostic Catalog Lookup Array
     const MASTER_TESTS_CATALOG = [
@@ -145,31 +168,31 @@
       {"en":"TIBC", "hi":"टी.आई.बी.सी. (TIBC)"},
       {"en":"LDH", "hi":"एल.डी.एच. (LDH)"},
       {"en":"24 hr urinary protein", "hi":"24 घंटे यूरिनरी प्रोटीन"},
-      {"en":"Drug overdose test", "hi":"ड्रग ओवरдोज टेस्ट"}
+      {"en":"Drug overdose test", "hi":"ड्रग ओवरडोज टेस्ट"}
     ];
 
-    // Initialize Page
+    // Initialize Page Data Configuration
     document.addEventListener("DOMContentLoaded", function() {
-      // 1. Force Local Date Render
       const today = new Date();
       const dateOptions = { day: '2-digit', month: 'long', year: 'numeric' };
       document.getElementById('dashboardLiveDate').textContent = today.toLocaleDateString('en-IN', dateOptions);
 
-      // 2. Attach Dropdown Listener
       document.getElementById('facilityDropdown').addEventListener('change', fetchLiveLaboratoryStatus);
     });
 
-    // Fetch availability status from Google Sheets web app link
+    // Fetch live status mapping arrays
     async function fetchLiveLaboratoryStatus() {
       const facilityId = document.getElementById('facilityDropdown').value;
       if (!facilityId) return;
 
       const loader = document.getElementById('loaderState');
       const grid = document.getElementById('testGrid');
+      const counterBanner = document.getElementById('counterBanner');
       const searchBar = document.getElementById('testSearchBar');
 
       loader.classList.remove('hidden');
       grid.classList.add('hidden');
+      counterBanner.classList.add('hidden');
       searchBar.value = ""; 
 
       try {
@@ -186,10 +209,16 @@
       }
     }
 
-    // Build grid UI
+    // Build grid UI and tally parameters
     function renderInteractiveDashboardGrid(downtimeMap) {
       const grid = document.getElementById('testGrid');
+      const counterBanner = document.getElementById('counterBanner');
+      const availText = document.getElementById('availableCount');
+      const notAvailText = document.getElementById('notAvailableCount');
+      
       grid.innerHTML = ""; 
+      let totalAvailable = 0;
+      let totalNotAvailable = 0;
 
       MASTER_TESTS_CATALOG.forEach(test => {
         const key = test.en;
@@ -210,6 +239,8 @@
             </div>
           `;
         }
+
+        if (isAvailable) totalAvailable++; else totalNotAvailable++;
 
         const card = document.createElement('div');
         card.className = `test-card bg-white p-4 rounded-xl border transition-all duration-200 ${
@@ -240,10 +271,14 @@
         grid.appendChild(card);
       });
 
+      availText.textContent = totalAvailable;
+      notAvailText.textContent = totalNotAvailable;
+
+      counterBanner.classList.remove('hidden');
       grid.classList.remove('hidden');
     }
 
-    // Real-Time Search Engine Filter logic
+    // Real-Time Search Engine Filter
     function runSmartDashboardFilter() {
       let queryInput = document.getElementById('testSearchBar').value.toLowerCase().trim();
       const testCards = document.querySelectorAll('.test-card');
