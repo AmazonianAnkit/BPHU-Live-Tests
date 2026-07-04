@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Lab Test Availability Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen pb-12">
+
+  <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-md px-4 py-6 text-center">
+    <h1 class="text-xl md:text-2xl font-bold tracking-tight">UP Health Department / उत्तर प्रदेश स्वास्थ्य विभाग</h1>
+    <p class="text-xs md:text-sm text-blue-100 mt-1 font-medium">Live Diagnostics Monitoring Portal / लाइव पैथोलॉजी जांच ट्रैकर</p>
+  </header>
+
+  <main class="max-w-4xl mx-auto px-4 mt-6">
+
+    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 mb-6 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
+        <div>
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">District / जनपद</span>
+          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-1.5">📍 Lucknow / लखनऊ</h2>
+        </div>
+        
+        <div class="bg-blue-50 border border-blue-100/60 rounded-xl px-4 py-2 text-left sm:text-right">
+          <span class="text-[11px] font-bold text-blue-500 uppercase tracking-wide block">As of Today / आज की स्थिति:</span>
+          <span id="dashboardLiveDate" class="text-sm font-bold text-blue-800">Loading...</span>
+        </div>
+      </div>
+
+      <div>
+        <label for="facilityDropdown" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Select Lab / लैबोरेटरी का चयन करें:</label>
+        <select id="facilityDropdown" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-inner">
+          <option value="" disabled selected>-- Choose Facility --</option>
+          <option value="CHC Gosaiganj">CHC Gosaiganj / सी.एच.सी. गोसाईगंज</option>
+          <option value="CHC Kakori">CHC Kakori / सी.एच.सी. काकोरी</option>
+          <option value="CHC Malihabad">CHC Malihabad / सी.एच.सी. मलिहाबाद</option>
+          <option value="CHC Chinhat">CHC Chinhat / सी.एच.सी. चिनहट</option>
+          <option value="CHC Mohanlalganj">CHC Mohanlalganj / सी.एच.सी. मोहनलालगंज</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="relative mb-6">
+      <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">🔍</span>
+      <input 
+        type="text" 
+        id="testSearchBar" 
+        onkeyup="runSmartDashboardFilter()" 
+        placeholder="Search test name (e.g., TLC, CBC, शुगर, हीमोग्लोबिन)..." 
+        class="w-full bg-white border border-slate-300 rounded-2xl pl-11 pr-4 py-3.5 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+      />
+    </div>
+
+    <div id="loaderState" class="hidden text-center py-12">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent mb-2"></div>
+      <p class="text-sm font-medium text-slate-500">Fetching live availability status from laboratory network...</p>
+    </div>
+
+    <div id="testGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div id="initialPrompt" class="col-span-full text-center py-12 text-slate-400 font-medium bg-white rounded-2xl border border-dashed border-slate-200">
+        👋 Please select a facility from the dropdown menu above to check live test availability.
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // ⚠️ REPLACE THIS WITH YOUR ACTUAL DEPLOYED WEB APP URL
+    const APPS_SCRIPT_WEB_APP_URL = "YOUR_DEPLOYED_WEB_APP_URL_HERE";
+
+    // 73 Core Master Diagnostic Catalog Lookup Array
+    const MASTER_TESTS_CATALOG = [
+      {"en":"Hemoglobin", "hi":"हीमोग्लोबिन"},
+      {"en":"Total leucocyte count", "hi":"कुल ल्यूकोसाइट काउंट (TLC)"},
+      {"en":"Differential leucocyte count", "hi":"डिफरेंशियल ल्यूकोसाइट काउंट (DLC)"},
+      {"en":"Platelet count", "hi":"प्लेटलेट काउंट"},
+      {"en":"Complete blood count", "hi":"कम्पलीट ब्लड काउंट (CBC)"},
+      {"en":"Erythrocyte sedimentation rate (ESR)", "hi":"ई.एस.आर. (ESR)"},
+      {"en":"Blood group and Rh typing, cross matching", "hi":"ब्लड ग्रुप और आरएच टाइपिंग"},
+      {"en":"Peripheral blood film", "hi":"पेरीफेरल ब्लड फिल्म"},
+      {"en":"Reticulocyte count", "hi":"रेटिकुलोसाइट काउंट"},
+      {"en":"Absolute eosinophil count", "hi":"एब्सोल्यूट इओसिनोफिल काउंट (AEC)"},
+      {"en":"Bleeding time and clotting time", "hi":"ब्लीडिंग और क्लॉटिंग टाइम"},
+      {"en":"Sickle cell screening test", "hi":"सिकल सेल स्क्रीनिंग टेस्ट"},
+      {"en":"Sickle cell strip test", "hi":"सिकल सेल स्ट्रिप टेस्ट"},
+      {"en":"Thalassemia screening", "hi":"थेलेसीमिया स्क्रीनिंग"},
+      {"en":"DCT for Hb electrophoresis", "hi":"डीसीटी फॉर एचबी इलेक्ट्रोफोरेसिस"},
+      {"en":"G6PD enzyme deficiency test", "hi":"जी6पीडी एंजाइम की कमी का परीक्षण"},
+      {"en":"MP slide method", "hi":"एम.पी. स्लाइड विधि"},
+      {"en":"Malaria rapid test", "hi":"मलेरिया रैपिड टेस्ट"},
+      {"en":"Prothrombin Time (PT) and INR", "hi":"प्रोथ्रोम्बिन टाइम (PT) और INR"},
+      {"en":"Activated partial thromboplastin time (APTT)", "hi":"एपीटीटी (APTT)"},
+      {"en":"HCG urine test", "hi":"एच.सी.जी. यूरिन टेस्ट"},
+      {"en":"Urine routine test", "hi":"यूरिन रूटीन टेस्ट"},
+      {"en":"Urine microscopy", "hi":"यूरिन माइक्रोस्कोपी"},
+      {"en":"Urine for microalbumin", "hi":"यूरिन माइक्रोएल्ब्यूमिन टेस्ट"},
+      {"en":"Urine for creatinine and ACR", "hi":"यूरिन क्रिएटिनिन और ACR"},
+      {"en":"Stool for ova and cyst", "hi":"मल में ओवा और सिस्ट की जांच"},
+      {"en":"Stool for occult blood", "hi":"मल में गुप्त रक्त की जांच"},
+      {"en":"Dengue test", "hi":"डेंगू टेस्ट"},
+      {"en":"RPR/VDRL test", "hi":"आर.पी.आर. / वी.डी.आर.एल. टेस्ट"},
+      {"en":"HIV test", "hi":"एच.आई.वी. टेस्ट"},
+      {"en":"HBsAg test", "hi":"एचबीएसएजी टेस्ट"},
+      {"en":"HCV test", "hi":"एच.सी.वी. टेस्ट"},
+      {"en":"Sputum for AFB", "hi":"बलगम की जांच (AFB)"},
+      {"en":"Typhoid test (IgM)", "hi":"टाइफाइड टेस्ट (IgM)"},
+      {"en":"Blood sugar", "hi":"ब्लड शुगर"},
+      {"en":"Glucose tolerance test (GTT)", "hi":"ग्लूकोज टॉलरेंस टेस्ट (GTT)"},
+      {"en":"Total bilirubin", "hi":"टोटल बिलीरुबिन"},
+      {"en":"Direct & indirect bilirubin", "hi":"डायरेक्ट और इनडायरेक्ट बिलीरुबिन"},
+      {"en":"Serum creatinine", "hi":"सीरम क्रिएटिनिन"},
+      {"en":"Blood urea", "hi":"ब्लड यूरिया"},
+      {"en":"SGPT", "hi":"एस.जी.पी.टी. (SGPT)"},
+      {"en":"SGOT", "hi":"एस.जी.ओ.टी. (SGOT)"},
+      {"en":"Alkaline phosphatase", "hi":"एल्कलाइन फॉस्फेट"},
+      {"en":"Total protein", "hi":"टोटल प्रोटीन"},
+      {"en":"Albumin & A/G ratio", "hi":"एल्ब्यूमिन और ए/जी रेशियो"},
+      {"en":"Globulin", "hi":"ग्लोबुलिन"},
+      {"en":"Total cholesterol", "hi":"टोटल कोलेस्ट्रॉल"},
+      {"en":"Triglycerides", "hi":"ट्राइग्लिसराइड्स"},
+      {"en":"VLDL", "hi":"वी.एल.डी.एल. (VLDL)"},
+      {"en":"HDL", "hi":"एच.डी.एल. (HDL)"},
+      {"en":"LDL", "hi":"एल.डी.एल. (LDL)"},
+      {"en":"Uric acid", "hi":"यूरिक एसिड"},
+      {"en":"HbA1c", "hi":"एचबीए1सी (HbA1c)"},
+      {"en":"Serum calcium", "hi":"सीरम कैल्शियम"},
+      {"en":"Wet mount & Gram stain", "hi":"वेट माउंट और ग्राम स्टेन"},
+      {"en":"Gram staining", "hi":"ग्राम स्टेनिंग"},
+      {"en":"VIA test", "hi":"वी.आई.ए. टेस्ट (VIA)"},
+      {"en":"K39 for Kala Azar", "hi":"काला जार के लिए K39"},
+      {"en":"Filaria test", "hi":"फाइलेरिया टेस्ट"},
+      {"en":"TB Mantoux", "hi":"टीबी मंटौक्स टेस्ट"},
+      {"en":"Troponin I", "hi":"ट्रोपोनिन आई"},
+      {"en":"CRP (Quantitative)", "hi":"सीआरपी (मात्रात्मक)"},
+      {"en":"Pap smear", "hi":"पैप स्मियर"},
+      {"en":"CBNAAT", "hi":"सीबीनाट (CBNAAT)"},
+      {"en":"Rapid test for cholera", "hi":"हैजा के लिए रैपिड टेस्ट"},
+      {"en":"CSF analysis", "hi":"सी.एस.एफ. विश्लेषण"},
+      {"en":"Fluid analysis", "hi":"फ्लूइड विश्लेषण"},
+      {"en":"Amylase", "hi":"एमाइलेज"},
+      {"en":"Iron", "hi":"आयरन"},
+      {"en":"TIBC", "hi":"टी.आई.बी.सी. (TIBC)"},
+      {"en":"LDH", "hi":"एल.डी.एच. (LDH)"},
+      {"en":"24 hr urinary protein", "hi":"24 घंटे यूरिनरी प्रोटीन"},
+      {"en":"Drug overdose test", "hi":"ड्रग ओवरдोज टेस्ट"}
+    ];
+
+    // Initialize Page
+    document.addEventListener("DOMContentLoaded", function() {
+      // 1. Force Local Date Render
+      const today = new Date();
+      const dateOptions = { day: '2-digit', month: 'long', year: 'numeric' };
+      document.getElementById('dashboardLiveDate').textContent = today.toLocaleDateString('en-IN', dateOptions);
+
+      // 2. Attach Dropdown Listener
+      document.getElementById('facilityDropdown').addEventListener('change', fetchLiveLaboratoryStatus);
+    });
+
+    // Fetch availability status from Google Sheets web app link
+    async function fetchLiveLaboratoryStatus() {
+      const facilityId = document.getElementById('facilityDropdown').value;
+      if (!facilityId) return;
+
+      const loader = document.getElementById('loaderState');
+      const grid = document.getElementById('testGrid');
+      const searchBar = document.getElementById('testSearchBar');
+
+      loader.classList.remove('hidden');
+      grid.classList.add('hidden');
+      searchBar.value = ""; 
+
+      try {
+        const requestUrl = `${APPS_SCRIPT_WEB_APP_URL}?facilityId=${encodeURIComponent(facilityId)}&mode=admin`;
+        const response = await fetch(requestUrl);
+        const downtimeDataMap = await response.json();
+
+        renderInteractiveDashboardGrid(downtimeDataMap);
+      } catch (err) {
+        alert("Failed to connect to spreadsheet. Verify your Web App URL deployment parameters.");
+        console.error(err);
+      } finally {
+        loader.classList.add('hidden');
+      }
+    }
+
+    // Build grid UI
+    function renderInteractiveDashboardGrid(downtimeMap) {
+      const grid = document.getElementById('testGrid');
+      grid.innerHTML = ""; 
+
+      MASTER_TESTS_CATALOG.forEach(test => {
+        const key = test.en;
+        const baselineIssue = downtimeMap[key];
+        
+        let isAvailable = true;
+        let reasonHtml = "";
+
+        if (baselineIssue && (baselineIssue.statusEn === "NOT AVAILABLE" || baselineIssue.statusHi === "उपलब्ध नहीं")) {
+          isAvailable = false;
+          const reasonEn = baselineIssue.reasonEn || "Technical issue encountered";
+          const reasonHi = baselineIssue.reasonHi || "तकनीकी समस्या के कारण बंद";
+          
+          reasonHtml = `
+            <div class="mt-3 pt-2.5 border-t border-rose-100 text-left">
+              <p class="text-xs text-rose-700 font-semibold leading-relaxed">⚠️ <strong>Reason:</strong> ${reasonEn}</p>
+              <p class="text-[11px] text-rose-600 font-medium mt-0.5 leading-relaxed">⚠️ <strong>कारण:</strong> ${reasonHi}</p>
+            </div>
+          `;
+        }
+
+        const card = document.createElement('div');
+        card.className = `test-card bg-white p-4 rounded-xl border transition-all duration-200 ${
+          isAvailable 
+            ? 'border-slate-200 shadow-sm hover:border-emerald-200 hover:shadow-md' 
+            : 'border-rose-200 bg-rose-50/40 shadow-inner'
+        }`;
+
+        card.setAttribute('data-search-key', `${test.en.toLowerCase()} ${test.hi.toLowerCase()}`);
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3">
+            <div class="text-left">
+              <h3 class="font-bold text-slate-800 text-base leading-snug">${test.en}</h3>
+              <p class="text-sm font-semibold text-slate-500 mt-0.5">${test.hi}</p>
+            </div>
+            <span class="shrink-0 inline-flex px-2.5 py-1 text-xs font-bold rounded-lg ${
+              isAvailable 
+                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
+                : 'bg-rose-100 text-rose-800 border border-rose-200'
+            }">
+              ${isAvailable ? 'AVAILABLE / उपलब्ध' : 'NOT AVAILABLE / बंद'}
+            </span>
+          </div>
+          ${reasonHtml}
+        `;
+
+        grid.appendChild(card);
+      });
+
+      grid.classList.remove('hidden');
+    }
+
+    // Real-Time Search Engine Filter logic
+    function runSmartDashboardFilter() {
+      let queryInput = document.getElementById('testSearchBar').value.toLowerCase().trim();
+      const testCards = document.querySelectorAll('.test-card');
+
+      const acronymDictionary = {
+        "tlc": "total leucocyte count",
+        "dlc": "differential leucocyte count",
+        "cbc": "complete blood count",
+        "esr": "erythrocyte sedimentation rate",
+        "aec": "absolute eosinophil count",
+        "pt": "prothrombin time",
+        "inr": "prothrombin time",
+        "hcg": "hcg urine test",
+        "acr": "urine for creatinine and acr",
+        "vdrl": "rpr/vdrl test",
+        "rpr": "rpr/vdrl test",
+        "hiv": "hiv test",
+        "afb": "sputum for afb",
+        "sgpt": "sgpt",
+        "sgot": "sgot",
+        "hba1c": "hba1c",
+        "via": "via test"
+      };
+
+      if (acronymDictionary[queryInput]) {
+        queryInput = acronymDictionary[queryInput];
+      }
+
+      testCards.forEach(card => {
+        const dataSearchValue = card.getAttribute('data-search-key') || '';
+        if (dataSearchValue.includes(queryInput)) {
+          card.style.display = ""; 
+        } else {
+          card.style.display = "none"; 
+        }
+      });
+    }
+  </script>
+</body>
+</html>
