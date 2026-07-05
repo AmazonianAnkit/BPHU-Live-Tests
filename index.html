@@ -26,92 +26,39 @@
         .status-pending { background-color: #fffaf0; color: #dd6b20; border: 1px solid #feebc8; animation: pulse 2s infinite; }
         .status-error { background-color: #fff5f5; color: #e53e3e; border: 1px solid #fed7d7; }
         
-        /* Stats Track Counters */
+        /* Glassmorphic Stats Track Counters */
         .counter-banner { background: #f7fafc; border-radius: 16px; border: 1px solid #edf2f7; padding: 1.25rem !important; }
         .counter-pill { background: white; padding: 0.6rem 1.2rem; border-radius: 12px; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 8px; border: 1px solid #edf2f7; }
         
-        /* Desktop Table Layout Settings */
-        .dept-header-row { background-color: #edf2f7 !important; color: #2b6cb0; font-weight: 800; font-size: 1.1rem; }
-        #test-matrix-table th { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.8px; color: #718096; padding: 1.2rem 1rem; border-bottom: 2px solid #edf2f7; }
-        #test-matrix-table td { padding: 1.1rem 1rem; font-size: 1rem; border-bottom: 1px solid #f7fafc; }
-        .test-name-container { display: flex; flex-direction: column; text-align: left; }
-        .test-name-main { font-weight: 600; color: #1a202c; }
+        /* Native App Style Diagnostics Cards Group */
+        .dept-section-title { font-size: 1.25rem; font-weight: 800; color: #2b6cb0; margin: 2rem 0 1rem 0; padding-bottom: 0.4rem; border-bottom: 2px solid #edf2f7; }
         
-        .status-tag-text { font-size: 0.8rem; font-weight: 800; display: block; line-height: 1.2; }
-        .reason-text-inline { font-size: 0.85rem; color: #b45309; font-weight: 600; display: block; margin-top: 0.25rem; }
-        .reason-text-hi { font-size: 0.78rem; color: #b45309; font-weight: 500; display: block; opacity: 0.9; margin-top: 0.1rem; }
+        .test-card-item { background: white; border: 1px solid #edf2f7; border-radius: 16px; padding: 1.25rem; box-shadow: 0 4px 12px rgba(0,0,0,0.01); display: flex; align-items: center; justify-content: space-between; transition: all 0.2s ease; gap: 1rem; }
+        .test-card-active { background-color: #ffffff; border-left: 5px solid #48bb78; }
+        .test-card-inactive { background-color: #fffafb; border: 1px solid #fed7d7; border-left: 5px solid #e53e3e; }
         
-        .badge-status-btn { border-radius: 10px; font-weight: 700; border: none; font-size: 0.85rem; letter-spacing: 0.3px; box-shadow: 0 4px 8px rgba(0,0,0,0.04); }
-        .badge-available { background: linear-gradient(135deg, #48bb78, #38a169); color: white; }
-        .badge-unavailable { background: linear-gradient(135deg, #f56565, #e53e3e); color: white; }
+        .test-card-left { flex: 1; display: flex; flex-direction: column; }
+        .test-card-title { font-size: 1.1rem; font-weight: 700; color: #1a202c; line-height: 1.3; margin: 0; }
         
-        /* Row Color Variants (Desktop) */
-        /* Row Color Variants (Desktop Fix) */
-          .test-row-active td { background-color: #ffffff !important; }
-          .test-row-inactive td { background-color: #fffdf0 !important; } /* Soft Yellow Background */
+        /* Badges Formatting */
+        .pill-status { font-size: 0.8rem; font-weight: 800; padding: 0.45rem 1rem; border-radius: 10px; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; line-height: 1.2; min-width: 130px; flex-shrink: 0; }
+        .pill-available { background: linear-gradient(135deg, #48bb78, #38a169); color: white; }
+        .pill-unavailable { background: linear-gradient(135deg, #f56565, #e53e3e); color: white; }
         
+        /* Sub-text Error Reasons Layout styling (Dark Red Color Variant) */
+        .reason-subtext-container { margin-top: 0.4rem; display: block; }
+        .reason-en { font-size: 0.9rem; color: #800000; font-weight: 700; display: inline-block; margin-right: 0.5rem; }
+        .reason-hi { font-size: 0.85rem; color: #800000; font-weight: 600; display: inline-block; }
+
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-        /* 📱 MOBILE PREMIUM APP UI TRANSFORMATION */
-        @media screen and (max-width: 768px) {
-            .status-card { padding: 1.25rem; border-radius: 20px; }
-            #test-matrix-table thead { display: none; }
-            #test-matrix-table, #test-matrix-table tbody, #test-matrix-table tr, #test-matrix-table td { display: block; width: 100% !important; box-sizing: border-box; }
-            
-            .dept-header-row { 
-                margin: 1.75rem 0 0.75rem 0;
-                background: transparent !important;
-                color: #2b6cb0;
-                font-weight: 800;
-                font-size: 1.15rem;
-                border: none !important;
-                padding: 0 0.25rem !important;
-            }
-            .dept-header-row td { background: transparent !important; border: none !important; padding: 0 !important; }
-            
-            #test-matrix-table tr:not(.dept-header-row) { 
-                margin-bottom: 0.85rem; 
-                border-radius: 16px; 
-                padding: 1rem 1.25rem; 
-                box-shadow: 0 4px 12px rgba(0,0,0,0.01);
-                border: 1px solid #edf2f7 !important;
-                display: flex !important;
-                align-items: center;
-                justify-content: space-between;
-                gap: 12px;
-            }
-            
-           /* Row Color Variants (Mobile Card Fix) */
-            .test-row-active td { background-color: #ffffff !important; }
-            .test-row-inactive td { background-color: #fffdf0 !important; border: 1px solid #fef3c7 !important; } /* Soft Yellow Card + Amber Border */
-            
-            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(1) { display: none; }
-            
-            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(2) { 
-                text-align: left !important; 
-                padding: 0 !important; 
-                border: none !important;
-                flex: 1;
-            }
-            
-            .test-name-main::before {
-                content: attr(data-lbl) ". ";
-                color: #a0aec0;
-                font-weight: 700;
-                margin-right: 0.25rem;
-            }
-            .test-name-main { font-size: 1.05rem; font-weight: 700 !important; color: #1a202c; line-height: 1.3; }
-            
-            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(3) { 
-                text-align: right !important;
-                padding: 0 !important; 
-                border: none !important;
-                flex-shrink: 0;
-            }
-            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(3) .badge-status-btn { 
-                width: 120px !important; 
-                padding: 0.4rem 0.5rem !important; 
-            }
+        /* Mobile Adjustments for extreme tight screen fits */
+        @media screen and (max-width: 480px) {
+            .test-card-item { padding: 1rem; }
+            .test-card-title { font-size: 1rem; }
+            .pill-status { min-width: 115px; font-size: 0.75rem; }
+            .reason-en { display: block; margin-bottom: 0.1rem; }
+            .reason-hi { display: block; }
         }
     </style>
 </head>
@@ -129,7 +76,7 @@
         <div class="control-card">
             <div class="row g-3">
                 <div class="col-12 col-md-6">
-                    <label class="form-label">Select Laboratory Facility / प्रयोगशाला इकाई का चयन करें</label>
+                    <label class="form-label">Select Laboratory Facility / चिकित्सा इकाई का चयन करें</label>
                     <select class="form-select form-select-lg py-2" id="facility-selector" onchange="handleFacilityChange()">
                         <option value="CHC Gosaiganj">CHC Gosaiganj / सी.एच.सी. गोसाईगंज</option>
                         <option value="CHC Kakori">CHC Kakori / सी.एच.सी. काकोरी</option>
@@ -206,10 +153,8 @@
 
         function handleFacilityChange() {
             const selector = document.getElementById("facility-selector");
-            const selectedFacility = selector.value;
-            const selectedFacilityText = selector.options[selector.selectedIndex].text;
-            document.getElementById("display-facility-name").innerText = selectedFacilityText;
-            fetchLiveStatus(selectedFacility);
+            fetchLiveStatus(selector.value);
+            document.getElementById("display-facility-name").innerText = selector.options[selector.selectedIndex].text;
         }
 
         function fetchLiveStatus(facilityId) {
@@ -222,12 +167,10 @@
             contentArea.innerHTML = `
                 <div class="text-center py-5">
                     <div class="spinner-border text-primary" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
-                    <p class="mt-3 text-muted fw-medium">Syncing live diagnostics engine data...</p>
+                    <p class="mt-3 text-muted fw-medium">Syncing live diagnostics data grid...</p>
                 </div>`;
 
-            const requestUrl = `${APPS_SCRIPT_API_URL}?facilityId=${encodeURIComponent(facilityId)}`;
-
-            fetch(requestUrl)
+            fetch(`${APPS_SCRIPT_API_URL}?facilityId=${encodeURIComponent(facilityId)}`)
                 .then(response => response.json())
                 .then(data => {
                     if (data.systemStatus === "PENDING") {
@@ -235,138 +178,119 @@
                         badge.innerText = "Yet to Update / अपडेशन प्रक्रिया में";
                         contentArea.innerHTML = `
                             <div class="alert alert-warning text-center border-0 py-5 my-2 shadow-sm" style="border-radius: 16px;">
-                                <h4 class="fw-bold text-warning-dark mb-2">⚠️ Updation In Progress / अपडेशन प्रक्रिया में</h4>
-                                <p class="mb-0 text-secondary fw-medium">Daily tracking logs have not been broadcasted yet.</p>
+                                <h4 class="fw-bold mb-2">⚠️ Updation In Progress / अपडेशन प्रक्रिया में</h4>
+                                <p class="mb-0 text-secondary fw-medium">Daily tracking logs haven't been broadcasted by this clinic yet today.</p>
                             </div>`;
                     } 
                     else if (data.systemStatus === "UPDATED") {
                         const totalExceptions = Object.keys(data).filter(k => k !== "systemStatus").length;
                         const operationalCount = 73 - totalExceptions;
                         
-                        if (totalExceptions === 0) {
-                            badge.className = "status-badge status-updated";
-                            badge.innerText = "All Tests Active / सभी जांच उपलब्ध";
-                        } else {
-                            badge.className = "status-badge status-error";
-                            badge.innerText = `${totalExceptions} Tests Inactive / जांच बाधित`;
-                        }
+                        badge.className = totalExceptions === 0 ? "status-badge status-updated" : "status-badge status-error";
+                        badge.innerText = totalExceptions === 0 ? "All Tests Active / सभी जांच उपलब्ध" : `${totalExceptions} Tests Inactive / जांच बाधित`;
 
-                        let counterHTML = `
+                        let renderHTML = `
                             <div class="p-3 mb-4 counter-banner d-flex justify-content-center align-items-center gap-3 flex-wrap">
                                 <div class="counter-pill text-success">🟢 Active / उपलब्ध: <span>${operationalCount}</span></div>
                                 <div class="counter-pill text-danger">⚠️ Inactive / बाधित: <span>${totalExceptions}</span></div>
                             </div>
+                            <div id="grid-catalog-container">
                         `;
-
-                        let tableHTML = counterHTML + `
-                            <div class="table-responsive" style="overflow-x: visible;">
-                                <table class="table table-hover align-middle" id="test-matrix-table">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th style="width: 10%">Sl No.</th>
-                                            <th style="width: 65%">Diagnostic Test Panel / जांच का नाम और कारण</th>
-                                            <th style="width: 25%" class="text-center">Status / स्थिति</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                        `;
-
-                        let absoluteIndex = 1;
 
                         for (const [deptName, testList] of Object.entries(DEPARTMENT_MASTER_CATALOG)) {
-                            tableHTML += `
-                                <tr class="dept-header-row">
-                                    <td colspan="3" class="text-start py-3 px-3 m-0">${deptName}</td>
-                                </tr>
+                            renderHTML += `
+                                <div class="dept-wrapper-block">
+                                    <div class="dept-section-title">${deptName}</div>
+                                    <div class="row g-3">
                             `;
 
                             testList.forEach((test) => {
                                 const isDown = data[test];
-                                const rowClass = isDown ? "test-row-inactive" : "test-row-active";
+                                const cardStatusClass = isDown ? "test-card-inactive" : "test-card-active";
                                 
                                 const statusBadge = isDown ? 
-                                    `<div class="badge-status-btn badge-unavailable px-3 py-2 text-center">
-                                        <span class="status-tag-text">NOT AVAILABLE</span>
-                                        <span class="status-tag-text" style="font-size: 0.72rem; opacity: 0.9;">अनुपलब्ध</span>
+                                    `<div class="pill-status pill-unavailable">
+                                        <span>NOT AVAILABLE</span>
+                                        <span style="font-size: 0.7rem; opacity: 0.85;">अनुपलब्ध</span>
                                      </div>` : 
-                                    `<div class="badge-status-btn badge-available px-3 py-2 text-center">
-                                        <span class="status-tag-text">AVAILABLE</span>
-                                        <span class="status-tag-text" style="font-size: 0.72rem; opacity: 0.9;">उपलब्ध</span>
+                                    `<div class="pill-status pill-available">
+                                        <span>AVAILABLE</span>
+                                        <span style="font-size: 0.7rem; opacity: 0.85;">उपलब्ध</span>
                                      </div>`;
                                      
-                                let reasonHTML = "";
+                                let reasonContent = "";
                                 if (isDown) {
-                                    reasonHTML = `
-                                        <div class="reason-text-inline">
-                                            <span class="reason-text-en">⚠️ Reason: ${isDown.reasonEn || ''}</span>
-                                            <span class="reason-text-hi">कारण: ${isDown.reasonHi || ''}</span>
+                                    reasonContent = `
+                                        <div class="reason-subtext-container">
+                                            <span class="reason-en">Reason: ${isDown.reasonEn}</span>
+                                            <span class="reason-hi">कारण: ${isDown.reasonHi}</span>
                                         </div>
                                     `;
                                 }
 
-                                tableHTML += `
-                                    <tr class="${rowClass}">
-                                        <td>${absoluteIndex}</td>
-                                        <td>
-                                            <div class="test-name-container search-target">
-                                                <span class="test-name-main" data-lbl="${absoluteIndex}">${test}</span>
-                                                ${reasonHTML}
+                                renderHTML += `
+                                    <div class="col-12 search-row-target">
+                                        <div class="test-card-item ${cardStatusClass}">
+                                            <div class="test-card-left">
+                                                <div class="test-card-title search-target-name">${test}</div>
+                                                ${reasonContent}
                                             </div>
-                                        </td>
-                                        <td class="text-center">${statusBadge}</td>
-                                    </tr>
+                                            <div class="test-card-right">
+                                                ${statusBadge}
+                                            </div>
+                                        </div>
+                                    </div>
                                 `;
-                                absoluteIndex++;
                             });
+
+                            renderHTML += `</div></div>`; 
                         }
 
-                        tableHTML += `</tbody></table></div>`;
-                        contentArea.innerHTML = tableHTML;
+                        renderHTML += `</div>`; 
+                        contentArea.innerHTML = renderHTML;
                     }
                 })
                 .catch(error => {
-                    console.error("Fetch failure:", error);
                     badge.className = "status-badge status-error";
                     badge.innerText = "Connection Error";
                     contentArea.innerHTML = `
                         <div class="alert alert-danger text-center border-0 py-4 shadow-sm" style="border-radius: 12px;">
                             <h5 class="fw-bold mb-1">❌ Connection Timeout</h5>
-                            <p class="mb-0 text-muted" style="font-size: 0.9rem;">Verify your Apps Script web app URL inside line 121.</p>
+                            <p class="mb-0 text-muted" style="font-size: 0.9rem;">Unable to link with health servers. Please double-check setup configuration script links.</p>
                         </div>`;
                 });
         }
 
         function filterTestTable() {
             let query = document.getElementById("search-bar").value.toLowerCase().trim();
-            const table = document.getElementById("test-matrix-table");
-            if (!table) return; 
+            if (ABBREVIATION_MAP[query]) {
+                query = ABBREVIATION_MAP[query];
+            }
             
-            if (ABBREVIATION_MAP[query]) { query = ABBREVIATION_MAP[query]; }
-            
-            const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-            let currentDeptHeader = null;
-            let visibleTestsInDept = 0;
+            const sections = document.getElementsByClassName("dept-wrapper-block");
 
-            for (let i = 0; i < rows.length; i++) {
-                if (rows[i].classList.contains("dept-header-row")) {
-                    if (currentDeptHeader) { currentDeptHeader.style.display = (visibleTestsInDept > 0) ? "" : "none"; }
-                    currentDeptHeader = rows[i];
-                    visibleTestsInDept = 0; 
-                    continue;
-                }
+            for (let i = 0; i < sections.length; i++) {
+                const cards = sections[i].getElementsByClassName("search-row-target");
+                let visibleCardsInSection = 0;
 
-                const testNameCell = rows[i].querySelector(".search-target");
-                if (testNameCell) {
-                    const textValue = testNameCell.textContent.toLowerCase();
-                    if (textValue.indexOf(query) > -1) {
-                        rows[i].style.setProperty("display", "", "important");
-                        visibleTestsInDept++;
-                    } else {
-                        rows[i].style.setProperty("display", "none", "important");
+                for (let j = 0; j < cards.length; j++) {
+                    const nameField = cards[j].querySelector(".search-target-name");
+                    if (nameField) {
+                        const textValue = (nameField.textContent || nameField.innerText).toLowerCase();
+                        if (textValue.indexOf(query) > -1) {
+                            cards[j].style.setProperty("display", "", "important");
+                            visibleCardsInSection++;
+                        } else {
+                            cards[j].style.setProperty("display", "none", "important");
+                        }
                     }
                 }
+
+                const deptHeader = sections[i].querySelector(".dept-section-title");
+                if (deptHeader) {
+                    sections[i].style.display = (visibleCardsInSection > 0 || query === "") ? "" : "none";
+                }
             }
-            if (currentDeptHeader) { currentDeptHeader.style.display = (visibleTestsInDept > 0 || query === "") ? "" : "none"; }
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
