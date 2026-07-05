@@ -34,11 +34,12 @@
         .dept-header-row { background-color: #edf2f7 !important; color: #2b6cb0; font-weight: 800; font-size: 1.1rem; }
         #test-matrix-table th { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.8px; color: #718096; padding: 1.2rem 1rem; border-bottom: 2px solid #edf2f7; }
         #test-matrix-table td { padding: 1.1rem 1rem; font-size: 1rem; border-bottom: 1px solid #f7fafc; }
+        .test-name-container { display: flex; flex-direction: column; }
         .test-name-main { font-weight: 600; color: #1a202c; }
         
         .status-tag-text { font-size: 0.8rem; font-weight: 800; display: block; line-height: 1.2; }
-        .reason-text-en { font-size: 0.95rem; color: #e53e3e; font-weight: 700; display: block; }
-        .reason-text-hi { font-size: 0.85rem; color: #e53e3e; font-weight: 500; display: block; opacity: 0.9; margin-top: 0.15rem; }
+        .reason-text-inline { font-size: 0.85rem; color: #e53e3e; font-weight: 600; display: block; margin-top: 0.25rem; }
+        .reason-text-hi { font-size: 0.78rem; color: #e53e3e; font-weight: 500; display: block; opacity: 0.9; margin-top: 0.1rem; }
         
         .badge-status-btn { border-radius: 10px; font-weight: 700; border: none; font-size: 0.85rem; letter-spacing: 0.3px; box-shadow: 0 4px 8px rgba(0,0,0,0.04); }
         .badge-available { background: linear-gradient(135deg, #48bb78, #38a169); color: white; }
@@ -54,7 +55,7 @@
             
             /* Clean App-Style Group Headers */
             .dept-header-row { 
-                margin: 2rem 0 0.75rem 0;
+                margin: 1.75rem 0 0.75rem 0;
                 background: transparent !important;
                 color: #2b6cb0;
                 font-weight: 800;
@@ -66,59 +67,51 @@
             
             /* Premium Fluid Native Mobile Cards */
             #test-matrix-table tr:not(.dept-header-row) { 
-                margin-bottom: 1rem; 
-                border-radius: 18px; 
-                padding: 1.25rem; 
-                box-shadow: 0 6px 16px rgba(0,0,0,0.015);
+                margin-bottom: 0.85rem; 
+                border-radius: 16px; 
+                padding: 1rem 1.25rem; 
+                box-shadow: 0 4px 12px rgba(0,0,0,0.01);
                 border: 1px solid #edf2f7 !important;
-                transition: transform 0.15s ease;
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
             }
             
-            /* Tint backgrounds elegantly depending on core system health flags */
             .test-row-active { background-color: #ffffff !important; }
             .test-row-inactive { background-color: #fffafb !important; border: 1px solid #fed7d7 !important; }
             
-            #test-matrix-table td:not(.dept-header-row td) { text-align: left !important; padding: 0 !important; border: none !important; }
+            /* Hide columns layout structures safely */
+            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(1) { display: none; }
+            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(4) { display: none; }
             
-            /* Inline Mini Badge Index Indicator styling */
-            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(1) { 
-                font-size: 0.72rem; 
-                color: #a0aec0; 
-                font-weight: 800; 
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-                margin-bottom: 0.35rem;
+            /* Center Left Module Block wrapper setup */
+            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(2) { 
+                text-align: left !important; 
+                padding: 0 !important; 
+                border: none !important;
+                flex: 1;
             }
-            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(1)::before { content: "Test #"; }
             
-            /* Header Focus Typography */
-            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(2) { margin-bottom: 0.85rem; }
-            .test-name-main { font-size: 1.15rem; font-weight: 700 !important; color: #1a202c; line-height: 1.3; }
+            /* Inline serial prefix engine inject element */
+            .test-name-main::before {
+                content: attr(data-index) ". ";
+                color: #a0aec0;
+                font-weight: 700;
+                margin-right: 0.25rem;
+            }
+            .test-name-main { font-size: 1.05rem; font-weight: 700 !important; color: #1a202c; line-height: 1.3; }
             
-            /* Layout adjustments for labels & statuses */
+            /* Right Badge layout wrapper positioning */
             #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(3) { 
-                display: flex; 
-                justify-content: space-between; 
-                align-items: center; 
-                padding-bottom: 0.25rem;
-            }
-            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(3)::before { 
-                content: "Status / स्थिति"; 
-                font-weight: 700; 
-                color: #718096; 
-                font-size: 0.85rem; 
+                text-align: right !important;
+                padding: 0 !important; 
+                border: none !important;
+                flex-shrink: 0;
             }
             #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(3) .badge-status-btn { 
-                width: 140px !important; 
-                padding: 0.45rem 0.5rem !important; 
-                text-align: center;
-            }
-            
-            /* Reason Layout adjustments for broken test elements */
-            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(4) { 
-                margin-top: 0.85rem;
-                padding-top: 0.85rem !important;
-                border-top: 1px dashed #e2e8f0 !important; 
+                width: 120px !important; 
+                padding: 0.4rem 0.5rem !important; 
             }
         }
     </style>
@@ -170,10 +163,8 @@
     </div>
 
     <script>
-        // 📝 CRITICAL STEP: Paste your deployed Google Apps Script Web App URL exactly between the quotes below:
         const APPS_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbzU38NanE49tWiZMbCcAAd-5RY-7qonBE6YQbYRd32B-9fZeU1mNBjy2QyPvsWtTu6x0g/exec";
 
-        // Structured Master Catalog Grouped Department Wise (Total 73 Tests Mapping)
         const DEPARTMENT_MASTER_CATALOG = {
             "Hematology & Blood Studies / रक्त विज्ञान": [
                 "Hemoglobin", "Total leucocyte count", "Differential leucocyte count", "Platelet count", "Complete blood count", "Erythrocyte sedimentation rate (ESR)", "Blood group and Rh typing, cross matching", "Peripheral blood film", "Reticulocyte count", "Absolute eosinophil count", "Bleeding time and clotting time", "Sickle cell screening test", "Sickle cell strip test", "Thalassemia screening", "DCT for Hb electrophoresis", "G6PD enzyme deficiency test", "MP slide method", "Malaria rapid test", "Prothrombin Time (PT) and INR", "Activated partial thromboplastin time (APTT)"
@@ -192,221 +183,9 @@
             ]
         };
 
-        // Smart Medical Abbreviation Dictionary Mapping
         const ABBREVIATION_MAP = {
-            "tlc": "total leucocyte count",
-            "dlc": "differential leucocyte count",
-            "hb": "hemoglobin",
-            "cbc": "complete blood count",
-            "esr": "erythrocyte sedimentation rate (esr)",
-            "pbf": "peripheral blood film",
-            "aec": "absolute eosinophil count",
-            "bt": "bleeding time and clotting time",
-            "ct": "bleeding time and clotting time",
-            "mp": "mp slide method",
-            "pt": "prothrombin time (pt) and inr",
-            "inr": "prothrombin time (pt) and inr",
-            "aptt": "activated partial thromboplastin time (aptt)",
-            "hcg": "hcg urine test",
-            "acr": "urine for creatinine and acr",
-            "afb": "sputum for afb",
-            "via": "via test",
-            "gtt": "glucose tolerance test (gtt)",
-            "sgpt": "sgpt",
-            "sgot": "sgot",
-            "vldl": "vldl",
-            "hdl": "hdl",
-            "ldl": "ldl",
-            "hba1c": "hba1c",
-            "tibc": "tibc",
-            "ldh": "ldh",
-            "crp": "crp (quantitative)"
-        };
-
-        // System Initialization Routines
-        document.addEventListener("DOMContentLoaded", function() {
-            displayCurrentDate();
-            handleFacilityChange(); 
-        });
-
-        function displayCurrentDate() {
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const today = new Date();
-            document.getElementById("current-date-badge").innerText = today.toLocaleDateString('en-US', options);
-        }
-
-        function handleFacilityChange() {
-            const selector = document.getElementById("facility-selector");
-            const selectedFacility = selector.value;
-            const selectedFacilityText = selector.options[selector.selectedIndex].text;
-            
-            document.getElementById("display-facility-name").innerText = selectedFacilityText;
-            fetchLiveStatus(selectedFacility);
-        }
-
-        function fetchLiveStatus(facilityId) {
-            const badge = document.getElementById("display-status-badge");
-            const contentArea = document.getElementById("dynamic-content-area");
-            
-            document.getElementById("search-bar").value = "";
-
-            badge.className = "status-badge status-pending";
-            badge.innerText = "Connecting...";
-            contentArea.innerHTML = `
-                <div class="text-center py-5">
-                    <div class="spinner-border text-primary" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
-                    <p class="mt-3 text-muted fw-medium">Syncing live diagnostics engine data...</p>
-                </div>`;
-
-            const requestUrl = `${APPS_SCRIPT_API_URL}?facilityId=${encodeURIComponent(facilityId)}`;
-
-            fetch(requestUrl)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.systemStatus === "PENDING") {
-                        badge.className = "status-badge status-pending";
-                        badge.innerText = "Yet to Update / अपडेशन प्रक्रिया में";
-                        contentArea.innerHTML = `
-                            <div class="alert alert-warning text-center border-0 py-5 my-2 shadow-sm" style="border-radius: 16px;">
-                                <h4 class="fw-bold text-warning-dark mb-2">⚠️ Updation In Progress / अपडेशन प्रक्रिया में</h4>
-                                <p class="mb-0 text-secondary fw-medium">The daily tracking logs have not been broadcasted by this clinic matrix point yet. Check back momentarily.</p>
-                            </div>`;
-                    } 
-                    else if (data.systemStatus === "UPDATED") {
-                        const totalExceptions = Object.keys(data).filter(k => k !== "systemStatus").length;
-                        const operationalCount = 73 - totalExceptions;
-                        
-                        if (totalExceptions === 0) {
-                            badge.className = "status-badge status-updated";
-                            badge.innerText = "All Tests Active / सभी जांच उपलब्ध";
-                        } else {
-                            badge.className = "status-badge status-error";
-                            badge.innerText = `${totalExceptions} Tests Inactive / जांच बाधित`;
-                        }
-
-                        let counterHTML = `
-                            <div class="p-3 mb-4 counter-banner d-flex justify-content-center align-items-center gap-3 flex-wrap">
-                                <div class="counter-pill text-success">🟢 Active / उपलब्ध: <span>${operationalCount}</span></div>
-                                <div class="counter-pill text-danger">⚠️ Inactive / बाधित: <span>${totalExceptions}</span></div>
-                            </div>
-                        `;
-
-                        let tableHTML = counterHTML + `
-                            <div class="table-responsive" style="overflow-x: visible;">
-                                <table class="table table-hover align-middle" id="test-matrix-table">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th style="width: 8%">Sl No.</th>
-                                            <th style="width: 52%">Diagnostic Test Panel / जांच का नाम</th>
-                                            <th style="width: 18%" class="text-center">Status / स्थिति</th>
-                                            <th style="width: 22%" class="text-end">Reason / कारण (If Inactive)</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                        `;
-
-                        let absoluteIndex = 1;
-
-                        for (const [deptName, testList] of Object.entries(DEPARTMENT_MASTER_CATALOG)) {
-                            tableHTML += `
-                                <tr class="dept-header-row">
-                                    <td colspan="4" class="text-start py-3 px-3 m-0">${deptName}</td>
-                                </tr>
-                            `;
-
-                            testList.forEach((test) => {
-                                const isDown = data[test];
-                                const rowClass = isDown ? "test-row-inactive" : "test-row-active";
-                                
-                                const statusBadge = isDown ? 
-                                    `<div class="badge-status-btn badge-unavailable px-3 py-2 text-center">
-                                        <span class="status-tag-text">NOT AVAILABLE</span>
-                                        <span class="status-tag-text" style="font-size: 0.72rem; opacity: 0.9;">अनुपलब्ध</span>
-                                     </div>` : 
-                                    `<div class="badge-status-btn badge-available px-3 py-2 text-center">
-                                        <span class="status-tag-text">AVAILABLE</span>
-                                        <span class="status-tag-text" style="font-size: 0.72rem; opacity: 0.9;">उपलब्ध</span>
-                                     </div>`;
-                                     
-                                let reasonTDContent = "";
-                                if (isDown) {
-                                    reasonTDContent = `
-                                        <span class="mobile-reason-header d-md-none fw-bold text-secondary" style="font-size:0.82rem; display:block; margin-bottom: 0.2rem;">Reason / कारण:</span>
-                                        <span class="reason-text-en">${isDown.reasonEn}</span>
-                                        <span class="reason-text-hi">${isDown.reasonHi}</span>
-                                    `;
-                                } else {
-                                    reasonTDContent = `<span class="d-none d-md-inline text-muted" style="opacity: 0.4;">—</span>`;
-                                }
-
-                                tableHTML += `
-                                    <tr class="${rowClass}">
-                                        <td>${absoluteIndex++}</td>
-                                        <td class="search-target test-name-main">${test}</td>
-                                        <td class="text-center">${statusBadge}</td>
-                                        <td class="text-end">${reasonTDContent}</td>
-                                    </tr>
-                                `;
-                            });
-                        }
-
-                        tableHTML += `</tbody></table></div>`;
-                        contentArea.innerHTML = tableHTML;
-                    }
-                })
-                .catch(error => {
-                    badge.className = "status-badge status-error";
-                    badge.innerText = "Connection Error";
-                    contentArea.innerHTML = `
-                        <div class="alert alert-danger text-center border-0 py-4 shadow-sm" style="border-radius: 12px;">
-                            <h5 class="fw-bold mb-1">❌ Connection Timeout</h5>
-                            <p class="mb-0 text-muted" style="font-size: 0.9rem;">Unable to link with health servers. Please verify setup parameters.</p>
-                        </div>`;
-                });
-        }
-
-        // Real-time Smart Text Filter Match Matrix Engine
-        function filterTestTable() {
-            let query = document.getElementById("search-bar").value.toLowerCase().trim();
-            const table = document.getElementById("test-matrix-table");
-            if (!table) return; 
-            
-            if (ABBREVIATION_MAP[query]) {
-                query = ABBREVIATION_MAP[query];
-            }
-            
-            const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
-            let currentDeptHeader = null;
-            let visibleTestsInDept = 0;
-
-            for (let i = 0; i < rows.length; i++) {
-                if (rows[i].classList.contains("dept-header-row")) {
-                    if (currentDeptHeader) {
-                        currentDeptHeader.style.display = (visibleTestsInDept > 0) ? "" : "none";
-                    }
-                    currentDeptHeader = rows[i];
-                    visibleTestsInDept = 0; 
-                    continue;
-                }
-
-                const testNameCell = rows[i].querySelector(".search-target");
-                if (testNameCell) {
-                    const textValue = (testNameCell.textContent || testNameCell.innerText).toLowerCase();
-                    
-                    if (textValue.indexOf(query) > -1) {
-                        rows[i].style.setProperty("display", "", "important");
-                        visibleTestsInDept++;
-                    } else {
-                        rows[i].style.setProperty("display", "none", "important");
-                    }
-                }
-            }
-
-            if (currentDeptHeader) {
-                currentDeptHeader.style.display = (visibleTestsInDept > 0 || query === "") ? "" : "none";
-            }
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+            "tlc": "total leucocyte count", "dlc": "differential leucocyte count", "hb": "hemoglobin", "cbc": "complete blood count",
+            "esr": "erythrocyte sedimentation rate (esr)", "pbf": "peripheral blood film", "aec": "absolute eosinophil count",
+            "bt": "bleeding time and clotting time", "ct": "bleeding time and clotting time", "mp": "mp slide method",
+            "pt": "prothrombin time (pt) and inr", "inr": "prothrombin time (pt) and inr", "aptt": "activated partial thromboplastin time (aptt)",
+            "hcg": "hcg urine test", "acr": "urine for
