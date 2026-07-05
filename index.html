@@ -26,7 +26,7 @@
         .status-pending { background-color: #fffaf0; color: #dd6b20; border: 1px solid #feebc8; animation: pulse 2s infinite; }
         .status-error { background-color: #fff5f5; color: #e53e3e; border: 1px solid #fed7d7; }
         
-        /* Glassmorphic Stats Track Counters */
+        /* Stats Track Counters */
         .counter-banner { background: #f7fafc; border-radius: 16px; border: 1px solid #edf2f7; padding: 1.25rem !important; }
         .counter-pill { background: white; padding: 0.6rem 1.2rem; border-radius: 12px; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 6px rgba(0,0,0,0.02); display: flex; align-items: center; gap: 8px; border: 1px solid #edf2f7; }
         
@@ -47,7 +47,7 @@
         
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-        /* 📱 MOBILE PREMIUM APP UI TRANSFORMATION */
+        /* 📱 MOBILE COHESIVE SYSTEM VIEW OVERRIDES */
         @media screen and (max-width: 768px) {
             .status-card { padding: 1.25rem; border-radius: 20px; }
             #test-matrix-table thead { display: none; }
@@ -81,11 +81,11 @@
             .test-row-active { background-color: #ffffff !important; }
             .test-row-inactive { background-color: #fffafb !important; border: 1px solid #fed7d7 !important; }
             
-            /* Hide columns layout structures safely */
+            /* Hide non-combined structures safely on mobile layout views */
             #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(1) { display: none; }
             #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(4) { display: none; }
             
-            /* Center Left Module Block wrapper setup */
+            /* Combined Information Core Block (Left Half) */
             #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(2) { 
                 text-align: left !important; 
                 padding: 0 !important; 
@@ -93,16 +93,16 @@
                 flex: 1;
             }
             
-            /* Inline serial prefix engine inject element */
+            /* Inline serial layout inject indicator */
             .test-name-main::before {
-                content: attr(data-index) ". ";
+                content: attr(data-lbl) ". ";
                 color: #a0aec0;
                 font-weight: 700;
                 margin-right: 0.25rem;
             }
             .test-name-main { font-size: 1.05rem; font-weight: 700 !important; color: #1a202c; line-height: 1.3; }
             
-            /* Right Badge layout wrapper positioning */
+            /* Status Badge Right Block Module */
             #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(3) { 
                 text-align: right !important;
                 padding: 0 !important; 
@@ -163,6 +163,7 @@
     </div>
 
     <script>
+        // 📝 CRITICAL STEP: Replace the string placeholder below with your actual deployed macro script link!
         const APPS_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbzU38NanE49tWiZMbCcAAd-5RY-7qonBE6YQbYRd32B-9fZeU1mNBjy2QyPvsWtTu6x0g/exec";
 
         const DEPARTMENT_MASTER_CATALOG = {
@@ -188,4 +189,191 @@
             "esr": "erythrocyte sedimentation rate (esr)", "pbf": "peripheral blood film", "aec": "absolute eosinophil count",
             "bt": "bleeding time and clotting time", "ct": "bleeding time and clotting time", "mp": "mp slide method",
             "pt": "prothrombin time (pt) and inr", "inr": "prothrombin time (pt) and inr", "aptt": "activated partial thromboplastin time (aptt)",
-            "hcg": "hcg urine test", "acr": "urine for
+            "hcg": "hcg urine test", "acr": "urine for creatinine and acr", "afb": "sputum for afb", "via": "via test",
+            "gtt": "glucose tolerance test (gtt)", "sgpt": "sgpt", "sgot": "sgot", "vldl": "vldl", "hdl": "hdl", "ldl": "ldl",
+            "hba1c": "hba1c", "tibc": "tibc", "ldh": "ldh", "crp": "crp (quantitative)"
+        };
+
+        document.addEventListener("DOMContentLoaded", function() {
+            displayCurrentDate();
+            handleFacilityChange(); 
+        });
+
+        function displayCurrentDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            document.getElementById("current-date-badge").innerText = today.toLocaleDateString('en-US', options);
+        }
+
+        function handleFacilityChange() {
+            const selector = document.getElementById("facility-selector");
+            const selectedFacility = selector.value;
+            const selectedFacilityText = selector.options[selector.selectedIndex].text;
+            document.getElementById("display-facility-name").innerText = selectedFacilityText;
+            fetchLiveStatus(selectedFacility);
+        }
+
+        function fetchLiveStatus(facilityId) {
+            const badge = document.getElementById("display-status-badge");
+            const contentArea = document.getElementById("dynamic-content-area");
+            document.getElementById("search-bar").value = "";
+
+            badge.className = "status-badge status-pending";
+            badge.innerText = "Connecting...";
+            contentArea.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status" style="width: 2.5rem; height: 2.5rem;"></div>
+                    <p class="mt-3 text-muted fw-medium">Syncing live diagnostics engine data...</p>
+                </div>`;
+
+            const requestUrl = `${APPS_SCRIPT_API_URL}?facilityId=${encodeURIComponent(facilityId)}`;
+
+            fetch(requestUrl)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.systemStatus === "PENDING") {
+                        badge.className = "status-badge status-pending";
+                        badge.innerText = "Yet to Update / अपडेशन प्रक्रिया में";
+                        contentArea.innerHTML = `
+                            <div class="alert alert-warning text-center border-0 py-5 my-2 shadow-sm" style="border-radius: 16px;">
+                                <h4 class="fw-bold text-warning-dark mb-2">⚠️ Updation In Progress / अपडेशन प्रक्रिया में</h4>
+                                <p class="mb-0 text-secondary fw-medium">Daily tracking logs have not been broadcasted yet.</p>
+                            </div>`;
+                    } 
+                    else if (data.systemStatus === "UPDATED") {
+                        const totalExceptions = Object.keys(data).filter(k => k !== "systemStatus").length;
+                        const operationalCount = 73 - totalExceptions;
+                        
+                        if (totalExceptions === 0) {
+                            badge.className = "status-badge status-updated";
+                            badge.innerText = "All Tests Active / सभी जांच उपलब्ध";
+                        } else {
+                            badge.className = "status-badge status-error";
+                            badge.innerText = `${totalExceptions} Tests Inactive / जांच बाधित`;
+                        }
+
+                        let counterHTML = `
+                            <div class="p-3 mb-4 counter-banner d-flex justify-content-center align-items-center gap-3 flex-wrap">
+                                <div class="counter-pill text-success">🟢 Active / उपलब्ध: <span>${operationalCount}</span></div>
+                                <div class="counter-pill text-danger">⚠️ Inactive / बाधित: <span>${totalExceptions}</span></div>
+                            </div>
+                        `;
+
+                        let tableHTML = counterHTML + `
+                            <div class="table-responsive" style="overflow-x: visible;">
+                                <table class="table table-hover align-middle" id="test-matrix-table">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th style="width: 8%">Sl No.</th>
+                                            <th style="width: 52%">Diagnostic Test Panel / जांच का नाम</th>
+                                            <th style="width: 18%" class="text-center">Status / स्थिति</th>
+                                            <th style="width: 22%" class="text-end">Reason / कारण (If Inactive)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+
+                        let absoluteIndex = 1;
+
+                        for (const [deptName, testList] of Object.entries(DEPARTMENT_MASTER_CATALOG)) {
+                            tableHTML += `
+                                <tr class="dept-header-row">
+                                    <td colspan="4" class="text-start py-3 px-3 m-0">${deptName}</td>
+                                </tr>
+                            `;
+
+                            testList.forEach((test) => {
+                                const isDown = data[test];
+                                const rowClass = isDown ? "test-row-inactive" : "test-row-active";
+                                
+                                const statusBadge = isDown ? 
+                                    `<div class="badge-status-btn badge-unavailable px-3 py-2 text-center">
+                                        <span class="status-tag-text">NOT AVAILABLE</span>
+                                        <span class="status-tag-text" style="font-size: 0.72rem; opacity: 0.9;">अनुपलब्ध</span>
+                                     </div>` : 
+                                    `<div class="badge-status-btn badge-available px-3 py-2 text-center">
+                                        <span class="status-tag-text">AVAILABLE</span>
+                                        <span class="status-tag-text" style="font-size: 0.72rem; opacity: 0.9;">उपलब्ध</span>
+                                     </div>`;
+                                     
+                                let reasonHTML = "";
+                                if (isDown) {
+                                    reasonHTML = `
+                                        <div class="reason-text-inline">
+                                            <span class="reason-text-en">⚠️ ${isDown.reasonEn || ''}</span>
+                                            <span class="reason-text-hi">${isDown.reasonHi || ''}</span>
+                                        </div>
+                                    `;
+                                }
+
+                                tableHTML += `
+                                    <tr class="${rowClass}">
+                                        <td>${absoluteIndex}</td>
+                                        <td>
+                                            <div class="test-name-container search-target">
+                                                <span class="test-name-main" data-lbl="${absoluteIndex}">${test}</span>
+                                                ${reasonHTML}
+                                            </div>
+                                        </td>
+                                        <td class="text-center">${statusBadge}</td>
+                                        <td class="text-end">
+                                            ${isDown ? `<span class="reason-text-en">${isDown.reasonEn || ''}</span><span class="reason-text-hi">${isDown.reasonHi || ''}</span>` : `<span class="text-muted" style="opacity: 0.4;">—</span>`}
+                                        </td>
+                                    </tr>
+                                `;
+                                absoluteIndex++;
+                            });
+                        }
+
+                        tableHTML += `</tbody></table></div>`;
+                        contentArea.innerHTML = tableHTML;
+                    }
+                })
+                .catch(error => {
+                    console.error("Fetch failure:", error);
+                    badge.className = "status-badge status-error";
+                    badge.innerText = "Connection Error";
+                    contentArea.innerHTML = `
+                        <div class="alert alert-danger text-center border-0 py-4 shadow-sm" style="border-radius: 12px;">
+                            <h5 class="fw-bold mb-1">❌ Connection Timeout</h5>
+                            <p class="mb-0 text-muted" style="font-size: 0.9rem;">Verify your Apps Script deployment link inside line 125.</p>
+                        </div>`;
+                });
+        }
+
+        function filterTestTable() {
+            let query = document.getElementById("search-bar").value.toLowerCase().trim();
+            const table = document.getElementById("test-matrix-table");
+            if (!table) return; 
+            
+            if (ABBREVIATION_MAP[query]) { query = ABBREVIATION_MAP[query]; }
+            
+            const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+            let currentDeptHeader = null;
+            let visibleTestsInDept = 0;
+
+            for (let i = 0; i < rows.length; i++) {
+                if (rows[i].classList.contains("dept-header-row")) {
+                    if (currentDeptHeader) { currentDeptHeader.style.display = (visibleTestsInDept > 0) ? "" : "none"; }
+                    currentDeptHeader = rows[i];
+                    visibleTestsInDept = 0; 
+                    continue;
+                }
+
+                const testNameCell = rows[i].querySelector(".search-target");
+                if (testNameCell) {
+                    const textValue = testNameCell.textContent.toLowerCase();
+                    if (textValue.indexOf(query) > -1) {
+                        rows[i].style.setProperty("display", "", "important");
+                        visibleTestsInDept++;
+                    } else {
+                        rows[i].style.setProperty("display", "none", "important");
+                    }
+                }
+            }
+            if (currentDeptHeader) { currentDeptHeader.style.display = (visibleTestsInDept > 0 || query === "") ? "" : "none"; }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
