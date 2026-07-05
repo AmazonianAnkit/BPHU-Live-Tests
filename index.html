@@ -52,13 +52,42 @@
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
-        /* Mobile Adjustments for extreme tight screen fits */
-        @media screen and (max-width: 480px) {
-            .test-card-item { padding: 1rem; }
-            .test-card-title { font-size: 1rem; }
-            .pill-status { min-width: 115px; font-size: 0.75rem; }
-            .reason-en { display: block; margin-bottom: 0.1rem; }
-            .reason-hi { display: block; }
+ /* Mobile Adjustments for extreme tight screen fits */
+@media screen and (max-width: 480px) {
+  .test-card-item { 
+    padding: 0.4rem 0.6rem !important; /* Shaves vertical space */
+    margin-bottom: 4px !important;     /* Pulls adjacent cards tight */
+    display: flex !important;          /* Forces layout to stay in a row */
+    align-items: center !important;    /* Centers text and status pill vertically */
+    justify-content: space-between !important;
+  }
+  
+  .test-card-title { 
+    font-size: 0.85rem !important; 
+    line-height: 1.2 !important;
+    overflow: hidden !important;       /* Prevents accidental overflow */
+    text-overflow: ellipsis !important;/* Adds "..." if text is layout-breakingly long */
+    white-space: nowrap !important;    /* 🚫 STRICT NO WRAP: Forces title onto one single line */
+    padding-right: 8px !important;     /* Safe distance from the status pill */
+  }
+  
+  .pill-status { 
+    min-width: auto !important;        /* Let it size dynamically based on text length */
+    white-space: nowrap !important;    /* 🚫 STRICT NO WRAP: Keeps status text on a single line */
+    font-size: 0.7rem !important; 
+    padding: 3px 8px !important;
+    flex-shrink: 0 !important;         /* Prevents the pill from squishing or shrinking */
+  }
+  
+  .reason-en, .reason-hi { 
+    display: block; 
+    font-size: 0.72rem !important; 
+    line-height: 1.1 !important;
+    white-space: nowrap !important;    /* 🚫 STRICT NO WRAP: Keeps logged errors on one line */
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
         }
     </style>
 </head>
