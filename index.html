@@ -46,8 +46,9 @@
         .badge-unavailable { background: linear-gradient(135deg, #f56565, #e53e3e); color: white; }
         
         /* Row Color Variants (Desktop) */
-        .test-row-active { background-color: #ffffff !important; }
-        .test-row-inactive { background-color: #fffdf0 !important; } /* Soft Yellow Background */
+        /* Row Color Variants (Desktop Fix) */
+          .test-row-active td { background-color: #ffffff !important; }
+          .test-row-inactive td { background-color: #fffdf0 !important; } /* Soft Yellow Background */
         
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
 
@@ -80,8 +81,9 @@
                 gap: 12px;
             }
             
-            .test-row-active { background-color: #ffffff !important; }
-            .test-row-inactive { background-color: #fffdf0 !important; border: 1px solid #fef3c7 !important; } /* Soft Yellow Card + Amber Border */
+           /* Row Color Variants (Mobile Card Fix) */
+            .test-row-active td { background-color: #ffffff !important; }
+            .test-row-inactive td { background-color: #fffdf0 !important; border: 1px solid #fef3c7 !important; } /* Soft Yellow Card + Amber Border */
             
             #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(1) { display: none; }
             
@@ -127,7 +129,7 @@
         <div class="control-card">
             <div class="row g-3">
                 <div class="col-12 col-md-6">
-                    <label class="form-label">Select Laboratory Facility / चिकित्सा इकाई का चयन करें</label>
+                    <label class="form-label">Select Laboratory Facility / प्रयोगशाला इकाई का चयन करें</label>
                     <select class="form-select form-select-lg py-2" id="facility-selector" onchange="handleFacilityChange()">
                         <option value="CHC Gosaiganj">CHC Gosaiganj / सी.एच.सी. गोसाईगंज</option>
                         <option value="CHC Kakori">CHC Kakori / सी.एच.सी. काकोरी</option>
