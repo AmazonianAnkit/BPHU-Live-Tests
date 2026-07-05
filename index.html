@@ -23,6 +23,7 @@
         .counter-banner { background: #f0f4f8; border-radius: 12px; font-weight: 600; font-size: 1rem; color: #4a5568; padding: 1rem !important; }
         .counter-banner .badge { font-size: 0.85rem; padding: 0.4rem 0.8rem; border-radius: 6px; }
         
+        .dept-header-row { background-color: #e2e8f0 !important; color: #2d3748; font-weight: 700; font-size: 1.05rem; }
         #test-matrix-table th { font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem 0.75rem; }
         #test-matrix-table td { padding: 0.9rem 0.75rem; font-size: 0.95rem; }
         .test-name-main { font-size: 1rem; color: #1a202c; }
@@ -39,22 +40,33 @@
         @media screen and (max-width: 768px) {
             #test-matrix-table thead { display: none; }
             #test-matrix-table, #test-matrix-table tbody, #test-matrix-table tr, #test-matrix-table td { display: block; width: 100% !important; }
-            #test-matrix-table tr { margin-bottom: 1.25rem; border: 1px solid #e2e8f0 !important; border-radius: 14px; padding: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
-            #test-matrix-table td { text-align: left !important; padding: 0.35rem 0.25rem; border: none !important; }
+            
+            /* Department Group Header on Mobile */
+            .dept-header-row { 
+                margin-top: 1.5rem;
+                margin-bottom: 0.5rem;
+                border-radius: 8px;
+                padding: 0.6rem 1rem !important;
+                text-align: center !important;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            }
+            
+            #test-matrix-table tr:not(.dept-header-row) { margin-bottom: 1.25rem; border: 1px solid #e2e8f0 !important; border-radius: 14px; padding: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.02); }
+            #test-matrix-table td:not(.dept-header-row td) { text-align: left !important; padding: 0.35rem 0.25rem; border: none !important; }
             
             /* Sl No. */
-            #test-matrix-table td:nth-of-type(1) { font-size: 0.75rem; color: #a0aec0; font-weight: 700; padding-bottom: 0; }
+            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(1) { font-size: 0.75rem; color: #a0aec0; font-weight: 700; padding-bottom: 0; }
             /* Test Name */
-            #test-matrix-table td:nth-of-type(2) { padding-top: 0; margin-bottom: 0.5rem; }
+            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(2) { padding-top: 0; margin-bottom: 0.5rem; }
             .test-name-main { font-size: 1.05rem; font-weight: 700 !important; }
             
             /* Status Base */
-            #test-matrix-table td:nth-of-type(3)::before { content: "Status / स्थिति: "; font-weight: 700; color: #718096; font-size: 0.85rem; margin-right: 0.5rem; }
-            #test-matrix-table td:nth-of-type(3) { display: flex; align-items: center; }
-            #test-matrix-table td:nth-of-type(3) .btn { display: inline-flex !important; width: auto !important; padding: 0.3rem 0.8rem !important; }
+            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(3)::before { content: "Status / स्थिति: "; font-weight: 700; color: #718096; font-size: 0.85rem; margin-right: 0.5rem; }
+            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(3) { display: flex; align-items: center; }
+            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(3) .btn { display: inline-flex !important; width: auto !important; padding: 0.3rem 0.8rem !important; }
             
             /* Reason Base */
-            #test-matrix-table td:nth-of-type(4) { border-top: 1px dashed #edf2f7 !important; margin-top: 0.6rem; padding-top: 0.6rem; }
+            #test-matrix-table tr:not(.dept-header-row) td:nth-of-type(4) { border-top: 1px dashed #edf2f7 !important; margin-top: 0.6rem; padding-top: 0.6rem; }
         }
     </style>
 </head>
@@ -106,16 +118,26 @@
 
     <script>
         // 📝 CRITICAL STEP: Paste your deployed Google Apps Script Web App URL exactly between the quotes below:
-        const APPS_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbzU38NanE49tWiZMbCcAAd-5RY-7qonBE6YQbYRd32B-9fZeU1mNBjy2QyPvsWtTu6x0g/exec";
+        const APPS_SCRIPT_API_URL = "YOUR_DEPLOYED_APPS_SCRIPT_WEB_APP_URL";
 
-        // Full Master Catalog Reference List of all 73 Core Diagnostic Test Elements
-        const MASTER_TEST_LIST = [
-            "Hemoglobin", "Total leucocyte count", "Differential leucocyte count", "Platelet count", "Complete blood count", "Erythrocyte sedimentation rate (ESR)", "Blood group and Rh typing, cross matching", "Peripheral blood film", "Reticulocyte count", "Absolute eosinophil count", "Bleeding time and clotting time", "Sickle cell screening test", "Sickle cell strip test", "Thalassemia screening", "DCT for Hb electrophoresis", "G6PD enzyme deficiency test", "MP slide method", "Malaria rapid test", "Prothrombin Time (PT) and INR", "Activated partial thromboplastin time (APTT)",
-            "HCG urine test", "Urine routine test", "Urine microscopy", "Urine for microalbumin", "Urine for creatinine and ACR", "Stool for ova and cyst", "Stool for occult blood",
-            "Dengue test", "RPR/VDRL test", "HIV test", "HBsAg test", "HCV test", "Sputum for AFB", "Typhoid test (IgM)", "Wet mount & Gram stain", "Gram staining", "VIA test", "K39 for Kala Azar", "Filaria test", "TB Mantoux", "Rapid test for cholera", "CBNAAT",
-            "Blood sugar", "Glucose tolerance test (GTT)", "Total bilirubin", "Direct & indirect bilirubin", "Serum creatinine", "Blood urea", "SGPT", "SGOT", "Alkaline phosphatase", "Total protein", "Albumin & A/G ratio", "Globulin", "Total cholesterol", "Triglycerides", "VLDL", "HDL", "LDL", "Uric acid", "HbA1c", "Serum calcium", "Amylase", "Iron", "TIBC", "LDH", "24 hr urinary protein",
-            "Troponin I", "CRP (Quantitative)", "Pap smear", "CSF analysis", "Fluid analysis", "Drug overdose test"
-        ];
+        // Structured Master Catalog Grouped Department Wise (Total 73 Tests Mapping)
+        const DEPARTMENT_MASTER_CATALOG = {
+            "Hematology & Blood Studies / रक्त विज्ञान": [
+                "Hemoglobin", "Total leucocyte count", "Differential leucocyte count", "Platelet count", "Complete blood count", "Erythrocyte sedimentation rate (ESR)", "Blood group and Rh typing, cross matching", "Peripheral blood film", "Reticulocyte count", "Absolute eosinophil count", "Bleeding time and clotting time", "Sickle cell screening test", "Sickle cell strip test", "Thalassemia screening", "DCT for Hb electrophoresis", "G6PD enzyme deficiency test", "MP slide method", "Malaria rapid test", "Prothrombin Time (PT) and INR", "Activated partial thromboplastin time (APTT)"
+            ],
+            "Clinical Pathology (Urine & Stool) / मूत्र एवं मल जांच": [
+                "HCG urine test", "Urine routine test", "Urine microscopy", "Urine for microalbumin", "Urine for creatinine and ACR", "Stool for ova and cyst", "Stool for occult blood"
+            ],
+            "Serology & Microbiology / सीरम विज्ञान और सूक्ष्म जीव विज्ञान": [
+                "Dengue test", "RPR/VDRL test", "HIV test", "HBsAg test", "HCV test", "Sputum for AFB", "Typhoid test (IgM)", "Wet mount & Gram stain", "Gram staining", "VIA test", "K39 for Kala Azar", "Filaria test", "TB Mantoux", "Rapid test for cholera", "CBNAAT"
+            ],
+            "Biochemistry / जैव रसायन": [
+                "Blood sugar", "Glucose tolerance test (GTT)", "Total bilirubin", "Direct & indirect bilirubin", "Serum creatinine", "Blood urea", "SGPT", "SGOT", "Alkaline phosphatase", "Total protein", "Albumin & A/G ratio", "Globulin", "Total cholesterol", "Triglycerides", "VLDL", "HDL", "LDL", "Uric acid", "HbA1c", "Serum calcium", "Amylase", "Iron", "TIBC", "LDH", "24 hr urinary protein"
+            ],
+            "Specialized Diagnostics & Fluids / विशिष्ट जांच": [
+                "Troponin I", "CRP (Quantitative)", "Pap smear", "CSF analysis", "Fluid analysis", "Drug overdose test"
+            ]
+        };
 
         // Smart Medical Abbreviation Dictionary Mapping
         const ABBREVIATION_MAP = {
@@ -151,7 +173,7 @@
         // System Initialization Routines
         document.addEventListener("DOMContentLoaded", function() {
             displayCurrentDate();
-            handleFacilityChange(); // Trigger background sync engine for default block item
+            handleFacilityChange(); 
         });
 
         function displayCurrentDate() {
@@ -230,40 +252,52 @@
                                     <tbody>
                         `;
 
-                        MASTER_TEST_LIST.forEach((test, index) => {
-                            const isDown = data[test];
-                            const rowClass = isDown ? "test-row-inactive" : "test-row-active";
-                            
-                            const statusBadge = isDown ? 
-                                `<div class="btn btn-sm btn-danger px-2 py-1 w-100 disabled text-white border-0" style="opacity:1;">
-                                    <span class="status-tag-text">NOT AVAILABLE</span>
-                                    <span class="status-tag-text">अनुपलब्ध</span>
-                                 </div>` : 
-                                `<div class="btn btn-sm btn-success px-2 py-1 w-100 disabled text-white border-0" style="opacity:1;">
-                                    <span class="status-tag-text">AVAILABLE</span>
-                                    <span class="status-tag-text">उपलब्ध</span>
-                                 </div>`;
-                                 
-                            let reasonTDContent = "";
-                            if (isDown) {
-                                reasonTDContent = `
-                                    <span class="mobile-reason-header d-md-none fw-bold text-secondary" style="font-size:0.85rem;">Reason / कारण: </span>
-                                    <span class="reason-text-en">${isDown.reasonEn}</span>
-                                    <span class="reason-text-hi">${isDown.reasonHi}</span>
-                                `;
-                            } else {
-                                reasonTDContent = `<span class="d-none d-md-inline text-muted">-</span>`;
-                            }
+                        let absoluteIndex = 1;
 
+                        // Loop through each Department Group
+                        for (const [deptName, testList] of Object.entries(DEPARTMENT_MASTER_CATALOG)) {
+                            // Inject Row Header for Department name
                             tableHTML += `
-                                <tr class="${rowClass}">
-                                    <td>${index + 1}</td>
-                                    <td class="fw-semibold search-target test-name-main">${test}</td>
-                                    <td class="text-center">${statusBadge}</td>
-                                    <td class="text-end">${reasonTDContent}</td>
+                                <tr class="dept-header-row font-weight-bold">
+                                    <td colspan="4" class="text-start py-2 px-3 dept-header-cell">${deptName}</td>
                                 </tr>
                             `;
-                        });
+
+                            testList.forEach((test) => {
+                                const isDown = data[test];
+                                const rowClass = isDown ? "test-row-inactive" : "test-row-active";
+                                
+                                const statusBadge = isDown ? 
+                                    `<div class="btn btn-sm btn-danger px-2 py-1 w-100 disabled text-white border-0" style="opacity:1;">
+                                        <span class="status-tag-text">NOT AVAILABLE</span>
+                                        <span class="status-tag-text">अनुपलब्ध</span>
+                                     </div>` : 
+                                    `<div class="btn btn-sm btn-success px-2 py-1 w-100 disabled text-white border-0" style="opacity:1;">
+                                        <span class="status-tag-text">AVAILABLE</span>
+                                        <span class="status-tag-text">उपलब्ध</span>
+                                     </div>`;
+                                     
+                                let reasonTDContent = "";
+                                if (isDown) {
+                                    reasonTDContent = `
+                                        <span class="mobile-reason-header d-md-none fw-bold text-secondary" style="font-size:0.85rem;">Reason / कारण: </span>
+                                        <span class="reason-text-en">${isDown.reasonEn}</span>
+                                        <span class="reason-text-hi">${isDown.reasonHi}</span>
+                                    `;
+                                } else {
+                                    reasonTDContent = `<span class="d-none d-md-inline text-muted">-</span>`;
+                                }
+
+                                tableHTML += `
+                                    <tr class="${rowClass}">
+                                        <td>${absoluteIndex++}</td>
+                                        <td class="fw-semibold search-target test-name-main">${test}</td>
+                                        <td class="text-center">${statusBadge}</td>
+                                        <td class="text-end">${reasonTDContent}</td>
+                                    </tr>
+                                `;
+                            });
+                        }
 
                         tableHTML += `</tbody></table></div>`;
                         contentArea.innerHTML = tableHTML;
@@ -291,18 +325,37 @@
             }
             
             const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+            let currentDeptHeader = null;
+            let visibleTestsInDept = 0;
 
+            // Iterate over all rows (including department group rows)
             for (let i = 0; i < rows.length; i++) {
+                if (rows[i].classList.contains("dept-header-row")) {
+                    // If we reach a new department header, manage the previous one first
+                    if (currentDeptHeader) {
+                        currentDeptHeader.style.display = (visibleTestsInDept > 0) ? "" : "none";
+                    }
+                    currentDeptHeader = rows[i];
+                    visibleTestsInDept = 0; // reset counter for new section
+                    continue;
+                }
+
                 const testNameCell = rows[i].querySelector(".search-target");
                 if (testNameCell) {
                     const textValue = (testNameCell.textContent || testNameCell.innerText).toLowerCase();
                     
                     if (textValue.indexOf(query) > -1) {
                         rows[i].style.display = "";
+                        visibleTestsInDept++;
                     } else {
                         rows[i].style.display = "none";
                     }
                 }
+            }
+
+            // Clean loop handling for the final department group header block left over
+            if (currentDeptHeader) {
+                currentDeptHeader.style.display = (visibleTestsInDept > 0 || query === "") ? "" : "none";
             }
         }
     </script>
