@@ -24,8 +24,8 @@
     <div class="dashboard-header text-center">
         <div class="container">
             <h1 class="fw-bold">उत्तर प्रदेश स्वास्थ्य विभाग</h1>
-            <p class="lead mb-1">Live Laboratory Test Availability Status Tracker</p>
-            <div class="badge bg-white text-dark fw-bold px-3 py-2" id="current-date-badge">Date: Loading...</div>
+            <p class="lead mb-1">Live Laboratory Test Availability Status Tracker (Lucknow Division)</p>
+            <div class="badge bg-white text-dark fw-bold px-3 py-2 mt-1" id="current-date-badge" style="font-size: 0.95rem;">Date: Loading...</div>
         </div>
     </div>
 
@@ -33,7 +33,7 @@
         <div class="control-card">
             <div class="row g-3">
                 <div class="col-12 col-md-6">
-                    <label class="form-label fw-bold text-muted">Select Laboratory Facility / चिकित्सा इकाई</label>
+                    <label class="form-label fw-bold text-secondary">Select Laboratory Facility / चिकित्सा इकाई का चयन करें</label>
                     <select class="form-select form-select-lg" id="facility-selector" onchange="handleFacilityChange()">
                         <option value="CHC Gosaiganj">CHC Gosaiganj / सी.एच.सी. गोसाईगंज</option>
                         <option value="CHC Kakori">CHC Kakori / सी.एच.सी. काकोरी</option>
@@ -46,8 +46,8 @@
                     </select>
                 </div>
                 <div class="col-12 col-md-6">
-                    <label class="form-label fw-bold text-muted">Search Diagnostic Test / जांच खोजें</label>
-                    <input type="text" class="form-control form-control-lg" id="search-bar" placeholder="Type test name (e.g. Hemoglobin, Sugar)..." onkeyup="filterTestTable()">
+                    <label class="form-label fw-bold text-secondary">Search Diagnostic Test / जांच का नाम खोजें</label>
+                    <input type="text" class="form-control form-control-lg" id="search-bar" placeholder="Type test name here (e.g. Hemoglobin, Glucose)..." onkeyup="filterTestTable()">
                 </div>
             </div>
         </div>
@@ -57,7 +57,7 @@
         <div class="status-card">
             <div class="d-flex justify-content-between align-items-center flex-wrap pb-3 mb-4 border-bottom">
                 <h3 class="fw-bold m-0" id="display-facility-name">CHC Gosaiganj</h3>
-                <div id="display-status-badge" class="status-badge status-pending">Loading Tracker Logs...</div>
+                <div id="display-status-badge" class="status-badge status-pending">Connecting...</div>
             </div>
             
             <div id="dynamic-content-area">
@@ -66,10 +66,10 @@
     </div>
 
     <script>
-        // 1. Paste your deployed Google Apps Script Web App URL exactly here:
+        // 📝 CRITICAL STEP: Paste your deployed Google Apps Script Web App URL exactly between the quotes below:
         const APPS_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbzU38NanE49tWiZMbCcAAd-5RY-7qonBE6YQbYRd32B-9fZeU1mNBjy2QyPvsWtTu6x0g/exec";
 
-        // 2. Full Master Catalog List of all 73 Mandatory Dashboard Test Names
+        // Full Master Catalog Reference List of all 73 Core Diagnostic Test Elements
         const MASTER_TEST_LIST = [
             "Hemoglobin", "Total leucocyte count", "Differential leucocyte count", "Platelet count", "Complete blood count", "Erythrocyte sedimentation rate (ESR)", "Blood group and Rh typing, cross matching", "Peripheral blood film", "Reticulocyte count", "Absolute eosinophil count", "Bleeding time and clotting time", "Sickle cell screening test", "Sickle cell strip test", "Thalassemia screening", "DCT for Hb electrophoresis", "G6PD enzyme deficiency test", "MP slide method", "Malaria rapid test", "Prothrombin Time (PT) and INR", "Activated partial thromboplastin time (APTT)",
             "HCG urine test", "Urine routine test", "Urine microscopy", "Urine for microalbumin", "Urine for creatinine and ACR", "Stool for ova and cyst", "Stool for occult blood",
@@ -78,10 +78,10 @@
             "Troponin I", "CRP (Quantitative)", "Pap smear", "CSF analysis", "Fluid analysis", "Drug overdose test"
         ];
 
-        // Run initialization routines on load
+        // System Initialization Routines
         document.addEventListener("DOMContentLoaded", function() {
             displayCurrentDate();
-            handleFacilityChange(); // Run initial fetch for default facility
+            handleFacilityChange(); // Trigger background sync engine for default block item
         });
 
         function displayCurrentDate() {
@@ -103,29 +103,33 @@
             const badge = document.getElementById("display-status-badge");
             const contentArea = document.getElementById("dynamic-content-area");
             
-            // Clear search bar on changing facility
+            // Wipe data inside search bar placeholder cleanly across switches
             document.getElementById("search-bar").value = "";
 
             badge.className = "status-badge status-pending";
             badge.innerText = "Connecting to Server...";
-            contentArea.innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">Fetching latest morning update logs...</p></div>`;
+            contentArea.innerHTML = `
+                <div class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <p class="mt-2 text-muted">Fetching today's morning log updates...</p>
+                </div>`;
 
             const requestUrl = `${APPS_SCRIPT_API_URL}?facilityId=${encodeURIComponent(facilityId)}`;
 
             fetch(requestUrl)
                 .then(response => response.json())
                 .then(data => {
-                    // CASE A: Not yet submitted today
+                    // CASE A: The Laboratory Technician has NOT yet submitted today's status form
                     if (data.systemStatus === "PENDING") {
                         badge.className = "status-badge status-pending";
                         badge.innerText = "Yet to Update / अपडेशन प्रक्रिया में";
                         contentArea.innerHTML = `
-                            <div class="alert alert-warning text-center border-0 py-4 my-3">
-                                <h4 class="fw-bold">⚠️ Updation In Progress</h4>
-                                <p class="mb-0 text-muted">The concerned lab personnel has not submitted today's status tracker report yet. Please try again later.</p>
+                            <div class="alert alert-warning text-center border-0 py-4 my-2">
+                                <h4 class="fw-bold mb-1">⚠️ Updation In Progress / अपडेशन प्रक्रिया में</h4>
+                                <p class="mb-0 text-muted">The daily validation tracking log hasn't been submitted by this facility yet today. Please try again later.</p>
                             </div>`;
                     } 
-                    // CASE B: Active Data Returned
+                    // CASE B: Active Data Tracked Successfully
                     else if (data.systemStatus === "UPDATED") {
                         const totalExceptions = Object.keys(data).filter(k => k !== "systemStatus").length;
                         
@@ -134,17 +138,17 @@
                             badge.innerText = "All Tests Active / सभी जांच उपलब्ध";
                         } else {
                             badge.className = "status-badge status-error";
-                            badge.innerText = `${totalExceptions} Tests Down / जांच बाधित`;
+                            badge.innerText = `${totalExceptions} Tests Inactive / जांच बाधित`;
                         }
 
-                        // Generate complete Interactive 73-test dashboard matrix table
+                        // Generate Structured 73-row Data Table
                         let tableHTML = `
                             <div class="table-responsive">
-                                <table class="table table-hover border align-middle mt-2" id="test-matrix-table">
+                                <table class="table table-hover border align-middle mt-1" id="test-matrix-table">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th style="width: 5%">#</th>
-                                            <th style="width: 55%">Diagnostic Test Name / जांच का नाम</th>
+                                            <th style="width: 8%">Sl No.</th>
+                                            <th style="width: 52%">Diagnostic Test Panel / जांच का नाम</th>
                                             <th style="width: 15%" class="text-center">Status / स्थिति</th>
                                             <th style="width: 25%" class="text-end">Reason / कारण (If Inactive)</th>
                                         </tr>
@@ -180,17 +184,17 @@
                     badge.innerText = "Connection Error";
                     contentArea.innerHTML = `
                         <div class="alert alert-danger text-center border-0 py-4">
-                            <h4 class="fw-bold">❌ Try Again Later</h4>
-                            <p class="mb-0">Unable to load data sync rules. Please verify internet configuration rules or web app deployments.</p>
+                            <h4 class="fw-bold">❌ Connection Timeout</h4>
+                            <p class="mb-0">Unable to link with health servers. Please verify deployment link parameters or check back later.</p>
                         </div>`;
                 });
         }
 
-       // Live Test Filter Search Logic Engine
+        // Real-time Text Filter Match Matrix Engine
         function filterTestTable() {
             const query = document.getElementById("search-bar").value.toLowerCase().trim();
             const table = document.getElementById("test-matrix-table");
-            if (!table) return; // Exit gracefully if table isn't rendered
+            if (!table) return; 
             
             const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
 
