@@ -210,19 +210,57 @@
                 });
         }
 
-        // Real-time Text Filter Match Matrix Engine
+       // Smart Medical Abbreviation Dictionary Mapping
+        const ABBREVIATION_MAP = {
+            "tlc": "total leucocyte count",
+            "dlc": "differential leucocyte count",
+            "hb": "hemoglobin",
+            "cbc": "complete blood count",
+            "esr": "erythrocyte sedimentation rate (esr)",
+            "pbf": "peripheral blood film",
+            "aec": "absolute eosinophil count",
+            "bt": "bleeding time and clotting time",
+            "ct": "bleeding time and clotting time",
+            "mp": "mp slide method",
+            "pt": "prothrombin time (pt) and inr",
+            "inr": "prothrombin time (pt) and inr",
+            "aptt": "activated partial thromboplastin time (aptt)",
+            "hcg": "hcg urine test",
+            "acr": "urine for creatinine and acr",
+            "afb": "sputum for afb",
+            "via": "via test",
+            "gtt": "glucose tolerance test (gtt)",
+            "sgpt": "sgpt",
+            "sgot": "sgot",
+            "vldl": "vldl",
+            "hdl": "hdl",
+            "ldl": "ldl",
+            "hba1c": "hba1c",
+            "tibc": "tibc",
+            "ldh": "ldh",
+            "crp": "crp (quantitative)"
+        };
+
+        // Real-time Smart Text Filter Match Matrix Engine
         function filterTestTable() {
-            const query = document.getElementById("search-bar").value.toLowerCase().trim();
+            let query = document.getElementById("search-bar").value.toLowerCase().trim();
             const table = document.getElementById("test-matrix-table");
             if (!table) return; 
+            
+            // Check if the user typed a known medical abbreviation, swap it for full search term
+            if (ABBREVIATION_MAP[query]) {
+                query = ABBREVIATION_MAP[query];
+            }
             
             const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
 
             for (let i = 0; i < rows.length; i++) {
                 const testNameCell = rows[i].querySelector(".search-target");
                 if (testNameCell) {
-                    const textValue = testNameCell.textContent || testNameCell.innerText;
-                    if (textValue.toLowerCase().indexOf(query) > -1) {
+                    const textValue = (testNameCell.textContent || testNameCell.innerText).toLowerCase();
+                    
+                    // Match either full string or abbreviation mapped alias string
+                    if (textValue.indexOf(query) > -1) {
                         rows[i].style.display = "";
                     } else {
                         rows[i].style.display = "none";
