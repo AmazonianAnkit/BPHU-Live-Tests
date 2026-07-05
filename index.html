@@ -19,6 +19,77 @@
         .test-row-inactive { background-color: #fff5f5; }
         .status-tag-text { font-size: 0.82rem; font-weight: 700; display: block; line-height: 1.2; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+
+        /* 📱 MOBILE RESPONSIVE RECONSTRUCTION ENGINE */
+        @media screen and (max-width: 768px) {
+            /* Hide traditional table headers completely on mobile */
+            #test-matrix-table thead { display: none; }
+            
+            /* Force table, rows, and cells to behave like block stack containers */
+            #test-matrix-table, #test-matrix-table tbody, #test-matrix-table tr, #test-matrix-table td { 
+                display: block; 
+                width: 100% !important; 
+            }
+            
+            /* Transform each row into an isolated card module */
+            #test-matrix-table tr {
+                margin-bottom: 1rem;
+                border: 1px solid #dee2e6 !important;
+                border-radius: 8px;
+                padding: 0.75rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            }
+            
+            #test-matrix-table td {
+                text-align: left !important;
+                padding: 0.4rem 0.5rem;
+                border: none !important;
+            }
+
+            /* Format the serial number row */
+            #test-matrix-table td:nth-of-type(1) {
+                font-size: 0.75rem;
+                color: #6c757d;
+                font-weight: bold;
+                padding-bottom: 0;
+            }
+
+            /* Format the main Diagnostic Test Name */
+            #test-matrix-table td:nth-of-type(2) {
+                font-size: 1.05rem;
+                padding-top: 0;
+            }
+
+            /* Dynamic Column Headings Injection via CSS pseudo-elements */
+            #test-matrix-table td:nth-of-type(3)::before {
+                content: "Status / स्थिति: ";
+                font-weight: bold;
+                color: #495057;
+                display: inline-block;
+                margin-right: 0.5rem;
+            }
+            
+            #test-matrix-table td:nth-of-type(3) .btn {
+                display: inline-flex !important;
+                width: auto !important;
+                padding: 0.25rem 0.75rem !important;
+                vertical-align: middle;
+            }
+            
+            #test-matrix-table td:nth-of-type(4)::before {
+                content: "Reason / कारण: ";
+                font-weight: bold;
+                color: #495057;
+                display: inline-block;
+                margin-right: 0.5rem;
+            }
+
+            #test-matrix-table td:nth-of-type(4) {
+                border-top: 1px dashed #e9ecef !important;
+                margin-top: 0.25rem;
+                padding-top: 0.5rem;
+            }
+        }
     </style>
 </head>
 <body>
