@@ -1,321 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Live Lab Test Availability Dashboard</title>
-  <!-- Tailwind CSS Core CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <style>
-    .hidden { display: none !important; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Lab Test Availability Status Update Portal - Lucknow</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .dashboard-header { background: linear-gradient(135deg, #0d6efd, #0a58ca); color: white; padding: 2.5rem 1rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .facility-card { background: white; border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 1.5rem; transition: transform 0.2s; }
+        .facility-card:hover { transform: translateY(-2px); }
+        .card-header-title { font-weight: 600; color: #333; display: flex; justify-content: space-between; align-items: center; }
+        .status-badge { font-size: 0.9rem; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; }
+        .status-updated { background-color: #d1e7dd; color: #0f5132; }
+        .status-pending { background-color: #fff3cd; color: #664d03; animation: pulse 2s infinite; }
+        .status-error { background-color: #f8d7da; color: #842029; }
+        .test-table { font-size: 0.95rem; margin-bottom: 0; }
+        .reason-badge { font-size: 0.8rem; font-weight: 500; }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
 </head>
-<body class="bg-slate-100 text-slate-800 font-sans antialiased min-h-screen pb-12">
+<body>
 
-  <!-- Header Section -->
-  <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-md px-4 py-6 text-center">
-    <h1 class="text-xl md:text-2xl font-bold tracking-tight">UP Health Department / उत्तर प्रदेश स्वास्थ्य विभाग</h1>
-    <p class="text-xs md:text-sm text-blue-100 mt-1 font-medium">Live Diagnostics Monitoring Portal / लाइव पैथोलॉजी जांच ट्रैकर</p>
-  </header>
-
-  <!-- Main Container -->
-  <main class="max-w-4xl mx-auto px-4 mt-6">
-
-    <!-- Top Banner: District Location & System Date -->
-    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 mb-6 space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-slate-100 pb-4">
-        <div>
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">District / जनपद</span>
-          <h2 class="text-lg font-bold text-slate-800 flex items-center gap-1.5">📍 Lucknow / लखनऊ</h2>
+    <div class="dashboard-header text-center">
+        <div class="container">
+            <h1 class="fw-bold">उत्तर प्रदेश स्वास्थ्य विभाग</h1>
+            <p class="lead mb-0">Live Laboratory Test Availability Status Tracker (Lucknow Division)</p>
+            <small class="opacity-75">All tests are operational by default. Live updates refresh based on daily morning status declarations.</small>
         </div>
-        
-        <!-- Live Calendar Date Banner -->
-        <div class="bg-blue-50 border border-blue-100/60 rounded-xl px-4 py-2 text-left sm:text-right">
-          <span class="text-[11px] font-bold text-blue-500 uppercase tracking-wide block">As of Today / आज की स्थिति:</span>
-          <span id="dashboardLiveDate" class="text-sm font-bold text-blue-800">Loading...</span>
-        </div>
-      </div>
-
-      <!-- Facility Select Options Dropdown (Strict 8 Lucknow CHCs) -->
-      <div>
-        <label for="facilityDropdown" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Select Lab / लैबोरेटरी का चयन करें:</label>
-        <select id="facilityDropdown" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-base font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all shadow-inner">
-          <option value="" disabled selected>-- Choose Facility --</option>
-          <option value="CHC Gosaiganj">CHC Gosaiganj / सी.एच.सी. गोसाईगंज</option>
-          <option value="CHC Kakori">CHC Kakori / सी.एच.सी. काकोरी</option>
-          <option value="CHC Malihabad">CHC Malihabad / सी.एच.सी. मलिहाबाद</option>
-          <option value="CHC Chinhat">CHC Chinhat / सी.एच.सी. चिनहट</option>
-          <option value="CHC Mohanlalganj">CHC Mohanlalganj / सी.एच.सी. मोहनलालगंज</option>
-          <option value="CHC Bakshi Ka Talab">CHC Bakshi Ka Talab / सी.एच.सी. बख्शी का तालाब (BKT)</option>
-          <option value="CHC Mal">CHC Mal / सी.एच.सी. माल</option>
-          <option value="CHC Sarojini Nagar">CHC Sarojini Nagar / सी.एच.सी. सरोजनी नगर</option>
-        </select>
-      </div>
     </div>
 
-    <!-- Live Counters Metric Banner -->
-    <div id="counterBanner" class="hidden flex gap-3 mb-6 font-bold text-sm">
-      <div class="flex-1 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl px-4 py-3 text-center shadow-sm">
-        ✅ Available / चालू: <span id="availableCount" class="text-lg ml-1 font-black text-emerald-600">0</span>
-      </div>
-      <div class="flex-1 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl px-4 py-3 text-center shadow-sm">
-        ⚠️ Not Available / बंद: <span id="notAvailableCount" class="text-lg ml-1 font-black text-rose-600">0</span>
-      </div>
-    </div>
-
-    <!-- Smart Search Engine Input Bar -->
-    <div class="relative mb-6">
-      <span class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">🔍</span>
-      <input 
-        type="text" 
-        id="testSearchBar" 
-        onkeyup="runSmartDashboardFilter()" 
-        placeholder="Search test name (e.g., TLC, CBC, शुगर, हीमोग्लोबिन)..." 
-        class="w-full bg-white border border-slate-300 rounded-2xl pl-11 pr-4 py-3.5 text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-      />
-    </div>
-
-    <!-- Loading State Placeholder Indicator -->
-    <div id="loaderState" class="hidden text-center py-12">
-      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent mb-2"></div>
-      <p class="text-sm font-medium text-slate-500">Fetching live availability status from laboratory network...</p>
-    </div>
-
-    <!-- Live Dual-Language Card Results Grid Layout -->
-    <div id="testGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div id="initialPrompt" class="col-span-full text-center py-12 text-slate-400 font-medium bg-white rounded-2xl border border-dashed border-slate-200">
-        👋 Please select a facility from the dropdown menu above to check live test availability.
-      </div>
-    </div>
-  </main>
-
-  <!-- JavaScript Interface Engine -->
-  <script>
-    // ⚠️ REPLACE THIS WITH YOUR ACTUAL DEPLOYED WEB APP URL
-    const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyRpmVunfImRjhfMDF0-zdobT-XvQwzY2LG7IDULS7JV1zHsIJdWRYLLYfXyZZE1vAYyA/exec";
-
-    // 73 Core Master Diagnostic Catalog Lookup Array
-    const MASTER_TESTS_CATALOG = [
-      {"en":"Hemoglobin", "hi":"हीमोग्लोबिन"},
-      {"en":"Total leucocyte count", "hi":"कुल ल्यूकोसाइट काउंट (TLC)"},
-      {"en":"Differential leucocyte count", "hi":"डिफरेंशियल ल्यूकोसाइट काउंट (DLC)"},
-      {"en":"Platelet count", "hi":"प्लेटलेट काउंट"},
-      {"en":"Complete blood count", "hi":"कम्पलीट ब्लड काउंट (CBC)"},
-      {"en":"Erythrocyte sedimentation rate (ESR)", "hi":"ई.एस.आर. (ESR)"},
-      {"en":"Blood group and Rh typing, cross matching", "hi":"ब्लड ग्रुप और आरएच टाइपिंग"},
-      {"en":"Peripheral blood film", "hi":"पेरीफेरल ब्लड फिल्म"},
-      {"en":"Reticulocyte count", "hi":"रेटिकुलोसाइट काउंट"},
-      {"en":"Absolute eosinophil count", "hi":"एब्सोल्यूट इओसिनोफिल काउंट (AEC)"},
-      {"en":"Bleeding time and clotting time", "hi":"ब्लीडिंग और क्लॉटिंग टाइम"},
-      {"en":"Sickle cell screening test", "hi":"सिकल सेल स्क्रीनिंग टेस्ट"},
-      {"en":"Sickle cell strip test", "hi":"सिकल सेल स्ट्रिप टेस्ट"},
-      {"en":"Thalassemia screening", "hi":"थेलेसीमिया स्क्रीनिंग"},
-      {"en":"DCT for Hb electrophoresis", "hi":"डीसीटी फॉर एचबी इलेक्ट्रोफोरेसिस"},
-      {"en":"G6PD enzyme deficiency test", "hi":"जी6पीडी एंजाइम की कमी का परीक्षण"},
-      {"en":"MP slide method", "hi":"एम.पी. स्लाइड विधि"},
-      {"en":"Malaria rapid test", "hi":"मलेरिया रैपिड टेस्ट"},
-      {"en":"Prothrombin Time (PT) and INR", "hi":"प्रोथ्रोम्बिन टाइम (PT) और INR"},
-      {"en":"Activated partial thromboplastin time (APTT)", "hi":"एपीटीटी (APTT)"},
-      {"en":"HCG urine test", "hi":"एच.सी.जी. यूरिन टेस्ट"},
-      {"en":"Urine routine test", "hi":"यूरिन रूटीन टेस्ट"},
-      {"en":"Urine microscopy", "hi":"यूरिन माइक्रोस्कोपी"},
-      {"en":"Urine for microalbumin", "hi":"यूरिन माइक्रोएल्ब्यूमिन टेस्ट"},
-      {"en":"Urine for creatinine and ACR", "hi":"यूरिन क्रिएटिनิน और ACR"},
-      {"en":"Stool for ova and cyst", "hi":"मल में ओवा और सिस्ट की जांच"},
-      {"en":"Stool for occult blood", "hi":"मल में गुप्त रक्त की जांच"},
-      {"en":"Dengue test", "hi":"डेंगू टेस्ट"},
-      {"en":"RPR/VDRL test", "hi":"आर.पी.आर. / वी.डी.आर.एल. टेस्ट"},
-      {"en":"HIV test", "hi":"एच.आई.वी. टेस्ट"},
-      {"en":"HBsAg test", "hi":"एचबीएसएजी टेस्ट"},
-      {"en":"HCV test", "hi":"एच.सी.वी. टेस्ट"},
-      {"en":"Sputum for AFB", "hi":"बलगम की जांच (AFB)"},
-      {"en":"Typhoid test (IgM)", "hi":"टाइफाइड टेस्ट (IgM)"},
-      {"en":"Blood sugar", "hi":"ब्लड शुगर"},
-      {"en":"Glucose tolerance test (GTT)", "hi":"ग्लूकोज टॉलरेंस टेस्ट (GTT)"},
-      {"en":"Total bilirubin", "hi":"टोटल बिलीरुबिन"},
-      {"en":"Direct & indirect bilirubin", "hi":"डायरेक्ट और इनडायरेक्ट बिलीरुबिन"},
-      {"en":"Serum creatinine", "hi":"सीरम क्रिएटिनिन"},
-      {"en":"Blood urea", "hi":"ब्लड यूरिया"},
-      {"en":"SGPT", "hi":"एस.जी.पी.टी. (SGPT)"},
-      {"en":"SGOT", "hi":"एस.जी.ओ.टी. (SGOT)"},
-      {"en":"Alkaline phosphatase", "hi":"एल्कलाइन फॉस्फेट"},
-      {"en":"Total protein", "hi":"टोटल प्रोटीन"},
-      {"en":"Albumin & A/G ratio", "hi":"एल्ब्यूमिन और ए/जी रेशियो"},
-      {"en":"Globulin", "hi":"ग्लोबुलिन"},
-      {"en":"Total cholesterol", "hi":"टोटल कोलेस्ट्रॉल"},
-      {"en":"Triglycerides", "hi":"ट्राइग्लिसराइड्स"},
-      {"en":"VLDL", "hi":"वी.एल.डी.एल. (VLDL)"},
-      {"en":"HDL", "hi":"एच.डी.एल. (HDL)"},
-      {"en":"LDL", "hi":"एल.डी.एल. (LDL)"},
-      {"en":"Uric acid", "hi":"यूरिक एसिड"},
-      {"en":"HbA1c", "hi":"एचबीए1सी (HbA1c)"},
-      {"en":"Serum calcium", "hi":"सीरम कैल्शियम"},
-      {"en":"Wet mount & Gram stain", "hi":"वेट माउंट और ग्राम स्टेन"},
-      {"en":"Gram staining", "hi":"ग्राम स्टेनिंग"},
-      {"en":"VIA test", "hi":"वी.आई.ए. टेस्ट (VIA)"},
-      {"en":"K39 for Kala Azar", "hi":"काला जार के लिए K39"},
-      {"en":"Filaria test", "hi":"फाइलेरिया टेस्ट"},
-      {"en":"TB Mantoux", "hi":"टीबी मंटौक्स टेस्ट"},
-      {"en":"Troponin I", "hi":"ट्रोपोनिन आई"},
-      {"en":"CRP (Quantitative)", "hi":"सीआरपी (मात्रात्मक)"},
-      {"en":"Pap smear", "hi":"पैप स्मियर"},
-      {"en":"CBNAAT", "hi":"सीबीनाट (CBNAAT)"},
-      {"en":"Rapid test for cholera", "hi":"हैजा के लिए रैपिड टेस्ट"},
-      {"en":"CSF analysis", "hi":"सी.एस.एफ. विश्लेषण"},
-      {"en":"Fluid analysis", "hi":"फ्लूइड विश्लेषण"},
-      {"en":"Amylase", "hi":"एमाइलेज"},
-      {"en":"Iron", "hi":"आयरन"},
-      {"en":"TIBC", "hi":"टी.आई.बी.सी. (TIBC)"},
-      {"en":"LDH", "hi":"एल.डी.एच. (LDH)"},
-      {"en":"24 hr urinary protein", "hi":"24 घंटे यूरिनरी प्रोटीन"},
-      {"en":"Drug overdose test", "hi":"ड्रग ओवरडोज टेस्ट"}
-    ];
-
-    // Initialize Page Data Configuration
-    document.addEventListener("DOMContentLoaded", function() {
-      const today = new Date();
-      const dateOptions = { day: '2-digit', month: 'long', year: 'numeric' };
-      document.getElementById('dashboardLiveDate').textContent = today.toLocaleDateString('en-IN', dateOptions);
-
-      document.getElementById('facilityDropdown').addEventListener('change', fetchLiveLaboratoryStatus);
-    });
-
-    // Fetch live status mapping arrays
-    async function fetchLiveLaboratoryStatus() {
-      const facilityId = document.getElementById('facilityDropdown').value;
-      if (!facilityId) return;
-
-      const loader = document.getElementById('loaderState');
-      const grid = document.getElementById('testGrid');
-      const counterBanner = document.getElementById('counterBanner');
-      const searchBar = document.getElementById('testSearchBar');
-
-      loader.classList.remove('hidden');
-      grid.classList.add('hidden');
-      counterBanner.classList.add('hidden');
-      searchBar.value = ""; 
-
-      try {
-        const requestUrl = `${APPS_SCRIPT_WEB_APP_URL}?facilityId=${encodeURIComponent(facilityId)}&mode=admin`;
-        const response = await fetch(requestUrl);
-        const downtimeDataMap = await response.json();
-
-        renderInteractiveDashboardGrid(downtimeDataMap);
-      } catch (err) {
-        alert("Failed to connect to spreadsheet. Verify your Web App URL deployment parameters.");
-        console.error(err);
-      } finally {
-        loader.classList.add('hidden');
-      }
-    }
-
-    // Build grid UI and tally parameters
-    function renderInteractiveDashboardGrid(downtimeMap) {
-      const grid = document.getElementById('testGrid');
-      const counterBanner = document.getElementById('counterBanner');
-      const availText = document.getElementById('availableCount');
-      const notAvailText = document.getElementById('notAvailableCount');
-      
-      grid.innerHTML = ""; 
-      let totalAvailable = 0;
-      let totalNotAvailable = 0;
-
-      MASTER_TESTS_CATALOG.forEach(test => {
-        const key = test.en;
-        const baselineIssue = downtimeMap[key];
-        
-        let isAvailable = true;
-        let reasonHtml = "";
-
-        if (baselineIssue && (baselineIssue.statusEn === "NOT AVAILABLE" || baselineIssue.statusHi === "उपलब्ध नहीं")) {
-          isAvailable = false;
-          const reasonEn = baselineIssue.reasonEn || "Technical issue encountered";
-          const reasonHi = baselineIssue.reasonHi || "तकनीकी समस्या के कारण बंद";
-          
-          reasonHtml = `
-            <div class="mt-3 pt-2.5 border-t border-rose-100 text-left">
-              <p class="text-xs text-rose-700 font-semibold leading-relaxed">⚠️ <strong>Reason:</strong> ${reasonEn}</p>
-              <p class="text-[11px] text-rose-600 font-medium mt-0.5 leading-relaxed">⚠️ <strong>कारण:</strong> ${reasonHi}</p>
+    <div class="container mb-5">
+        <div class="row" id="dashboard-grid">
             </div>
-          `;
+    </div>
+
+    <script>
+        // 1. Paste your deployed Google Apps Script Web App URL exactly here:
+        const APPS_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbwPUUJbYKcl7HYTfIlHnY4_OfoWDSu9DCvNKMS543JgxOeAY8KHdb-qOSPNlct5gtXnVg/exec";
+
+        // 2. Master configuration array tracking all 8 pilot facilities
+        const FACILITIES = [
+            { id: "CHC Gosaiganj", name: "CHC Gosaiganj / सी.एच.सी. गोसाईगंज" },
+            { id: "CHC Kakori", name: "CHC Kakori / सी.एच.सी. काकोरी" },
+            { id: "CHC Malihabad", name: "CHC Malihabad / सी.एच.सी. मलिहाबाद" },
+            { id: "CHC Chinhat", name: "CHC Chinhat / सी.एच.सी. चिनहट" },
+            { id: "CHC Mohanlalganj", name: "CHC Mohanlalganj / सी.एच.सी. मोहनलालगंज" },
+            { id: "CHC Bakshi Ka Talab", name: "CHC Bakshi Ka Talab / सी.एच.सी. बी.के.टी." },
+            { id: "CHC Mal", name: "CHC Mal / सी.एच.सी. माल" },
+            { id: "CHC Sarojini Nagar", name: "CHC Sarojini Nagar / सी.एच.सी. सरोजनी नगर" }
+        ];
+
+        /**
+         * Initialize Dashboard Layout and fetch real-time logs sequentially
+         */
+        document.addEventListener("DOMContentLoaded", function() {
+            const gridContainer = document.getElementById("dashboard-grid");
+            
+            // Step A: Draw individual skeleton loader cards for all facilities upfront
+            FACILITIES.forEach(facility => {
+                const cardHTML = `
+                    <div class="col-12 col-xl-6">
+                        <div class="card facility-card p-4">
+                            <div class="card-header-title pb-3 border-bottom">
+                                <span>${facility.name}</span>
+                                <span id="badge-${cleanId(facility.id)}" class="status-badge status-pending">Fetching Status...</span>
+                            </div>
+                            <div class="card-body p-0 pt-3" id="content-${cleanId(facility.id)}">
+                                <div class="text-center py-3 text-muted">
+                                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                    Connecting to secure health servers...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                gridContainer.innerHTML += cardHTML;
+            });
+
+            // Step B: Trigger asynchronous parallel fetch operations for all facility records
+            FACILITIES.forEach(facility => {
+                fetchFacilityData(facility);
+            });
+        });
+
+        /**
+         * Pulls live telemetry metrics from the Google Sheet App API context
+         */
+        function fetchFacilityData(facility) {
+            const targetId = cleanId(facility.id);
+            const badgeElement = document.getElementById(`badge-${targetId}`);
+            const contentElement = document.getElementById(`content-${targetId}`);
+            
+            // Build absolute URL request format containing parameter queries
+            const requestUrl = `${APPS_SCRIPT_API_URL}?facilityId=${encodeURIComponent(facility.id)}`;
+
+            fetch(requestUrl)
+                .then(response => {
+                    if (!response.ok) throw new Error("Network latency/response failure");
+                    return response.json();
+                })
+                .then(data => {
+                    // CASE A: Lab Technician has not yet submitted an entry for today
+                    if (data.systemStatus === "PENDING") {
+                        badgeElement.className = "status-badge status-pending";
+                        badgeElement.innerText = "Yet to Update / अपडेशन प्रक्रिया में";
+                        
+                        contentElement.innerHTML = `
+                            <div class="alert alert-warning border-0 m-0 py-3 text-center">
+                                <strong class="d-block mb-1">⚠️ Status Update Awaited</strong>
+                                The daily availability declaration form hasn't been logged by this facility yet today. Please try again later.
+                            </div>
+                        `;
+                    } 
+                    // CASE B: Daily update logs successfully located and parsed
+                    else if (data.systemStatus === "UPDATED") {
+                        // Extract exception records keys (excluding the system configuration tag)
+                        const exceptions = Object.keys(data).filter(key => key !== "systemStatus");
+
+                        if (exceptions.length === 0) {
+                            badgeElement.className = "status-badge status-updated";
+                            badgeElement.innerText = "All Tests Active / सभी जांच उपलब्ध";
+                            contentElement.innerHTML = `
+                                <div class="alert alert-success border-0 m-0 py-3 text-center">
+                                    <strong>✅ 100% Operational</strong><br>All 73 diagnostic panel services are running normally today without downtime.
+                                </div>
+                            `;
+                        } else {
+                            badgeElement.className = "status-badge status-error";
+                            badgeElement.innerText = `${exceptions.length} Tests Inactive / जांच बाधित`;
+                            
+                            // Generate structured error log table for down elements
+                            let tableHTML = `
+                                <div class="table-responsive">
+                                    <table class="table table-striped test-table border align-middle">
+                                        <thead class="table-dark">
+                                            <tr>
+                                                <th>Affected Diagnostic Test / जांच का नाम</th>
+                                                <th class="text-end">Reason / कारण</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                            `;
+
+                            exceptions.forEach(testName => {
+                                const details = data[testName];
+                                tableHTML += `
+                                    <tr>
+                                        <td class="fw-semibold text-danger">${testName}</td>
+                                        <td class="text-end">
+                                            <span class="badge bg-danger reason-badge d-block mb-1">${details.reasonEn}</span>
+                                            <small class="text-muted d-block font-monospace" style="font-size:0.75rem;">${details.reasonHi}</small>
+                                        </td>
+                                    </tr>
+                                `;
+                            });
+
+                            tableHTML += `
+                                        </tbody>
+                                    </table>
+                                </div>
+                            `;
+                            contentElement.innerHTML = tableHTML;
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error(`Error loading data for ${facility.id}:`, error);
+                    badgeElement.className = "status-badge status-error";
+                    badgeElement.innerText = "Try Again Later";
+                    contentElement.innerHTML = `
+                        <div class="alert alert-danger border-0 m-0 py-3 text-center">
+                            <strong>❌ Connection Timeout</strong><br>
+                            Unable to pull modern status logs. Please verify internet configuration parameters or server assets.
+                        </div>
+                    `;
+                });
         }
 
-        if (isAvailable) totalAvailable++; else totalNotAvailable++;
-
-        const card = document.createElement('div');
-        card.className = `test-card bg-white p-4 rounded-xl border transition-all duration-200 ${
-          isAvailable 
-            ? 'border-slate-200 shadow-sm hover:border-emerald-200 hover:shadow-md' 
-            : 'border-rose-200 bg-rose-50/40 shadow-inner'
-        }`;
-
-        card.setAttribute('data-search-key', `${test.en.toLowerCase()} ${test.hi.toLowerCase()}`);
-
-        card.innerHTML = `
-          <div class="flex items-start justify-between gap-3">
-            <div class="text-left">
-              <h3 class="font-bold text-slate-800 text-base leading-snug">${test.en}</h3>
-              <p class="text-sm font-semibold text-slate-500 mt-0.5">${test.hi}</p>
-            </div>
-            <span class="shrink-0 inline-flex px-2.5 py-1 text-xs font-bold rounded-lg ${
-              isAvailable 
-                ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' 
-                : 'bg-rose-100 text-rose-800 border border-rose-200'
-            }">
-              ${isAvailable ? 'TESTS AVAILABLE / उपलब्ध जांचें' : 'TESTS NOT AVAILABLE / अनुपलब्ध जांचें'}
-            </span>
-          </div>
-          ${reasonHtml}
-        `;
-
-        grid.appendChild(card);
-      });
-
-      availText.textContent = totalAvailable;
-      notAvailText.textContent = totalNotAvailable;
-
-      counterBanner.classList.remove('hidden');
-      grid.classList.remove('hidden');
-    }
-
-    // Real-Time Search Engine Filter
-    function runSmartDashboardFilter() {
-      let queryInput = document.getElementById('testSearchBar').value.toLowerCase().trim();
-      const testCards = document.querySelectorAll('.test-card');
-
-      const acronymDictionary = {
-        "tlc": "total leucocyte count",
-        "dlc": "differential leucocyte count",
-        "cbc": "complete blood count",
-        "esr": "erythrocyte sedimentation rate",
-        "aec": "absolute eosinophil count",
-        "pt": "prothrombin time",
-        "inr": "prothrombin time",
-        "hcg": "hcg urine test",
-        "acr": "urine for creatinine and acr",
-        "vdrl": "rpr/vdrl test",
-        "rpr": "rpr/vdrl test",
-        "hiv": "hiv test",
-        "afb": "sputum for afb",
-        "sgpt": "sgpt",
-        "sgot": "sgot",
-        "hba1c": "hba1c",
-        "via": "via test"
-      };
-
-      if (acronymDictionary[queryInput]) {
-        queryInput = acronymDictionary[queryInput];
-      }
-
-      testCards.forEach(card => {
-        const dataSearchValue = card.getAttribute('data-search-key') || '';
-        if (dataSearchValue.includes(queryInput)) {
-          card.style.display = ""; 
-        } else {
-          card.style.display = "none"; 
+        /**
+         * Helper utility to clean whitespace and special characters from elements IDs
+         */
+        function cleanId(string) {
+            return string.replace(/[^a-zA-Z0-9]/g, "");
         }
-      });
-    }
-  </script>
+    </script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
