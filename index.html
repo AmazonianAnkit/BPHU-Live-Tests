@@ -3,25 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Lab Test Availability Status Update Portal - Lucknow</title>
+    <title>Live Lab Test Availability Status Portal - Lucknow</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        .dashboard-header { background: linear-gradient(135deg, #0d6efd, #0a58ca); color: white; padding: 2.5rem 1rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
-        .facility-card { background: white; border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 1.5rem; transition: transform 0.2s; }
-        .facility-card:hover { transform: translateY(-2px); }
-        .card-header-title { font-weight: 600; color: #333; display: flex; justify-content: space-between; align-items: center; }
-        .status-badge { font-size: 0.9rem; padding: 0.5rem 1rem; border-radius: 20px; font-weight: 600; }
+        .dashboard-header { background: linear-gradient(135deg, #0d6efd, #0a58ca); color: white; padding: 2rem 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .control-card { background: white; border: none; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); padding: 1.5rem; margin-top: -1.5rem; margin-bottom: 2rem; }
+        .status-card { background: white; border: none; border-radius: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); padding: 2rem; }
+        .status-badge { font-size: 1rem; padding: 0.5rem 1.2rem; border-radius: 20px; font-weight: 600; display: inline-block; }
         .status-updated { background-color: #d1e7dd; color: #0f5132; }
         .status-pending { background-color: #fff3cd; color: #664d03; animation: pulse 2s infinite; }
         .status-error { background-color: #f8d7da; color: #842029; }
-        .test-table { font-size: 0.95rem; margin-bottom: 0; }
-        .reason-badge { font-size: 0.8rem; font-weight: 500; }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.7; }
-            100% { opacity: 1; }
-        }
+        .test-row-active { background-color: #ffffff; }
+        .test-row-inactive { background-color: #fff5f5; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
@@ -29,167 +24,190 @@
     <div class="dashboard-header text-center">
         <div class="container">
             <h1 class="fw-bold">उत्तर प्रदेश स्वास्थ्य विभाग</h1>
-            <p class="lead mb-0">Live Laboratory Test Availability Status Tracker (Lucknow Division)</p>
-            <small class="opacity-75">All tests are operational by default. Live updates refresh based on daily morning status declarations.</small>
+            <p class="lead mb-1">Live Laboratory Test Availability Status Tracker</p>
+            <div class="badge bg-white text-dark fw-bold px-3 py-2" id="current-date-badge">Date: Loading...</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="control-card">
+            <div class="row g-3">
+                <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold text-muted">Select Laboratory Facility / चिकित्सा इकाई</label>
+                    <select class="form-select form-select-lg" id="facility-selector" onchange="handleFacilityChange()">
+                        <option value="CHC Gosaiganj">CHC Gosaiganj / सी.एच.सी. गोसाईगंज</option>
+                        <option value="CHC Kakori">CHC Kakori / सी.एच.सी. काकोरी</option>
+                        <option value="CHC Malihabad">CHC Malihabad / सी.एच.सी. मलिहाबाद</option>
+                        <option value="CHC Chinhat">CHC Chinhat / सी.एच.सी. चिनहट</option>
+                        <option value="CHC Mohanlalganj">CHC Mohanlalganj / सी.एच.सी. मोहनलालगंज</option>
+                        <option value="CHC Bakshi Ka Talab">CHC Bakshi Ka Talab / सी.एच.सी. बी.के.टी.</option>
+                        <option value="CHC Mal">CHC Mal / सी.एच.सी. माल</option>
+                        <option value="CHC Sarojini Nagar">CHC Sarojini Nagar / सी.एच.सी. सरोजनी नगर</option>
+                    </select>
+                </div>
+                <div class="col-12 col-md-6">
+                    <label class="form-label fw-bold text-muted">Search Diagnostic Test / जांच खोजें</label>
+                    <input type="text" class="form-control form-control-lg" id="search-bar" placeholder="Type test name (e.g. Hemoglobin, Sugar)..." onkeyup="filterTestTable()">
+                </div>
+            </div>
         </div>
     </div>
 
     <div class="container mb-5">
-        <div class="row" id="dashboard-grid">
+        <div class="status-card">
+            <div class="d-flex justify-content-between align-items-center flex-wrap pb-3 mb-4 border-bottom">
+                <h3 class="fw-bold m-0" id="display-facility-name">CHC Gosaiganj</h3>
+                <div id="display-status-badge" class="status-badge status-pending">Loading Tracker Logs...</div>
             </div>
+            
+            <div id="dynamic-content-area">
+                </div>
+        </div>
     </div>
 
     <script>
         // 1. Paste your deployed Google Apps Script Web App URL exactly here:
         const APPS_SCRIPT_API_URL = "https://script.google.com/macros/s/AKfycbzU38NanE49tWiZMbCcAAd-5RY-7qonBE6YQbYRd32B-9fZeU1mNBjy2QyPvsWtTu6x0g/exec";
 
-        // 2. Master configuration array tracking all 8 pilot facilities
-        const FACILITIES = [
-            { id: "CHC Gosaiganj", name: "CHC Gosaiganj / सी.एच.सी. गोसाईगंज" },
-            { id: "CHC Kakori", name: "CHC Kakori / सी.एच.सी. काकोरी" },
-            { id: "CHC Malihabad", name: "CHC Malihabad / सी.एच.सी. मलिहाबाद" },
-            { id: "CHC Chinhat", name: "CHC Chinhat / सी.एच.सी. चिनहट" },
-            { id: "CHC Mohanlalganj", name: "CHC Mohanlalganj / सी.एच.सी. मोहनलालगंज" },
-            { id: "CHC Bakshi Ka Talab", name: "CHC Bakshi Ka Talab / सी.एच.सी. बी.के.टी." },
-            { id: "CHC Mal", name: "CHC Mal / सी.एच.सी. माल" },
-            { id: "CHC Sarojini Nagar", name: "CHC Sarojini Nagar / सी.एच.सी. सरोजनी नगर" }
+        // 2. Full Master Catalog List of all 73 Mandatory Dashboard Test Names
+        const MASTER_TEST_LIST = [
+            "Hemoglobin", "Total leucocyte count", "Differential leucocyte count", "Platelet count", "Complete blood count", "Erythrocyte sedimentation rate (ESR)", "Blood group and Rh typing, cross matching", "Peripheral blood film", "Reticulocyte count", "Absolute eosinophil count", "Bleeding time and clotting time", "Sickle cell screening test", "Sickle cell strip test", "Thalassemia screening", "DCT for Hb electrophoresis", "G6PD enzyme deficiency test", "MP slide method", "Malaria rapid test", "Prothrombin Time (PT) and INR", "Activated partial thromboplastin time (APTT)",
+            "HCG urine test", "Urine routine test", "Urine microscopy", "Urine for microalbumin", "Urine for creatinine and ACR", "Stool for ova and cyst", "Stool for occult blood",
+            "Dengue test", "RPR/VDRL test", "HIV test", "HBsAg test", "HCV test", "Sputum for AFB", "Typhoid test (IgM)", "Wet mount & Gram stain", "Gram staining", "VIA test", "K39 for Kala Azar", "Filaria test", "TB Mantoux", "Rapid test for cholera", "CBNAAT",
+            "Blood sugar", "Glucose tolerance test (GTT)", "Total bilirubin", "Direct & indirect bilirubin", "Serum creatinine", "Blood urea", "SGPT", "SGOT", "Alkaline phosphatase", "Total protein", "Albumin & A/G ratio", "Globulin", "Total cholesterol", "Triglycerides", "VLDL", "HDL", "LDL", "Uric acid", "HbA1c", "Serum calcium", "Amylase", "Iron", "TIBC", "LDH", "24 hr urinary protein",
+            "Troponin I", "CRP (Quantitative)", "Pap smear", "CSF analysis", "Fluid analysis", "Drug overdose test"
         ];
 
-        /**
-         * Initialize Dashboard Layout and fetch real-time logs sequentially
-         */
+        // Run initialization routines on load
         document.addEventListener("DOMContentLoaded", function() {
-            const gridContainer = document.getElementById("dashboard-grid");
-            
-            // Step A: Draw individual skeleton loader cards for all facilities upfront
-            FACILITIES.forEach(facility => {
-                const cardHTML = `
-                    <div class="col-12 col-xl-6">
-                        <div class="card facility-card p-4">
-                            <div class="card-header-title pb-3 border-bottom">
-                                <span>${facility.name}</span>
-                                <span id="badge-${cleanId(facility.id)}" class="status-badge status-pending">Fetching Status...</span>
-                            </div>
-                            <div class="card-body p-0 pt-3" id="content-${cleanId(facility.id)}">
-                                <div class="text-center py-3 text-muted">
-                                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-                                    Connecting to secure health servers...
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                gridContainer.innerHTML += cardHTML;
-            });
-
-            // Step B: Trigger asynchronous parallel fetch operations for all facility records
-            FACILITIES.forEach(facility => {
-                fetchFacilityData(facility);
-            });
+            displayCurrentDate();
+            handleFacilityChange(); // Run initial fetch for default facility
         });
 
-        /**
-         * Pulls live telemetry metrics from the Google Sheet App API context
-         */
-        function fetchFacilityData(facility) {
-            const targetId = cleanId(facility.id);
-            const badgeElement = document.getElementById(`badge-${targetId}`);
-            const contentElement = document.getElementById(`content-${targetId}`);
+        function displayCurrentDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const today = new Date();
+            document.getElementById("current-date-badge").innerText = "Today's Date: " + today.toLocaleDateString('en-US', options);
+        }
+
+        function handleFacilityChange() {
+            const selector = document.getElementById("facility-selector");
+            const selectedFacility = selector.value;
+            const selectedFacilityText = selector.options[selector.selectedIndex].text;
             
-            // Build absolute URL request format containing parameter queries
-            const requestUrl = `${APPS_SCRIPT_API_URL}?facilityId=${encodeURIComponent(facility.id)}`;
+            document.getElementById("display-facility-name").innerText = selectedFacilityText;
+            fetchLiveStatus(selectedFacility);
+        }
+
+        function fetchLiveStatus(facilityId) {
+            const badge = document.getElementById("display-status-badge");
+            const contentArea = document.getElementById("dynamic-content-area");
+            
+            // Clear search bar on changing facility
+            document.getElementById("search-bar").value = "";
+
+            badge.className = "status-badge status-pending";
+            badge.innerText = "Connecting to Server...";
+            contentArea.innerHTML = `<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="mt-2 text-muted">Fetching latest morning update logs...</p></div>`;
+
+            const requestUrl = `${APPS_SCRIPT_API_URL}?facilityId=${encodeURIComponent(facilityId)}`;
 
             fetch(requestUrl)
-                .then(response => {
-                    if (!response.ok) throw new Error("Network latency/response failure");
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    // CASE A: Lab Technician has not yet submitted an entry for today
+                    // CASE A: Not yet submitted today
                     if (data.systemStatus === "PENDING") {
-                        badgeElement.className = "status-badge status-pending";
-                        badgeElement.innerText = "Yet to Update / अपडेशन प्रक्रिया में";
-                        
-                        contentElement.innerHTML = `
-                            <div class="alert alert-warning border-0 m-0 py-3 text-center">
-                                <strong class="d-block mb-1">⚠️ Status Update Awaited</strong>
-                                The daily availability declaration form hasn't been logged by this facility yet today. Please try again later.
-                            </div>
-                        `;
+                        badge.className = "status-badge status-pending";
+                        badge.innerText = "Yet to Update / अपडेशन प्रक्रिया में";
+                        contentArea.innerHTML = `
+                            <div class="alert alert-warning text-center border-0 py-4 my-3">
+                                <h4 class="fw-bold">⚠️ Updation In Progress</h4>
+                                <p class="mb-0 text-muted">The concerned lab personnel has not submitted today's status tracker report yet. Please try again later.</p>
+                            </div>`;
                     } 
-                    // CASE B: Daily update logs successfully located and parsed
+                    // CASE B: Active Data Returned
                     else if (data.systemStatus === "UPDATED") {
-                        // Extract exception records keys (excluding the system configuration tag)
-                        const exceptions = Object.keys(data).filter(key => key !== "systemStatus");
-
-                        if (exceptions.length === 0) {
-                            badgeElement.className = "status-badge status-updated";
-                            badgeElement.innerText = "All Tests Active / सभी जांच उपलब्ध";
-                            contentElement.innerHTML = `
-                                <div class="alert alert-success border-0 m-0 py-3 text-center">
-                                    <strong>✅ 100% Operational</strong><br>All 73 diagnostic panel services are running normally today without downtime.
-                                </div>
-                            `;
+                        const totalExceptions = Object.keys(data).filter(k => k !== "systemStatus").length;
+                        
+                        if (totalExceptions === 0) {
+                            badge.className = "status-badge status-updated";
+                            badge.innerText = "All Tests Active / सभी जांच उपलब्ध";
                         } else {
-                            badgeElement.className = "status-badge status-error";
-                            badgeElement.innerText = `${exceptions.length} Tests Inactive / जांच बाधित`;
-                            
-                            // Generate structured error log table for down elements
-                            let tableHTML = `
-                                <div class="table-responsive">
-                                    <table class="table table-striped test-table border align-middle">
-                                        <thead class="table-dark">
-                                            <tr>
-                                                <th>Affected Diagnostic Test / जांच का नाम</th>
-                                                <th class="text-end">Reason / कारण</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                            `;
+                            badge.className = "status-badge status-error";
+                            badge.innerText = `${totalExceptions} Tests Down / जांच बाधित`;
+                        }
 
-                            exceptions.forEach(testName => {
-                                const details = data[testName];
-                                tableHTML += `
-                                    <tr>
-                                        <td class="fw-semibold text-danger">${testName}</td>
-                                        <td class="text-end">
-                                            <span class="badge bg-danger reason-badge d-block mb-1">${details.reasonEn}</span>
-                                            <small class="text-muted d-block font-monospace" style="font-size:0.75rem;">${details.reasonHi}</small>
-                                        </td>
-                                    </tr>
-                                `;
-                            });
+                        // Generate complete Interactive 73-test dashboard matrix table
+                        let tableHTML = `
+                            <div class="table-responsive">
+                                <table class="table table-hover border align-middle mt-2" id="test-matrix-table">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th style="width: 5%">#</th>
+                                            <th style="width: 55%">Diagnostic Test Name / जांच का नाम</th>
+                                            <th style="width: 15%" class="text-center">Status / स्थिति</th>
+                                            <th style="width: 25%" class="text-end">Reason / कारण (If Inactive)</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+
+                        MASTER_TEST_LIST.forEach((test, index) => {
+                            const isDown = data[test];
+                            const rowClass = isDown ? "test-row-inactive" : "test-row-active";
+                            const statusBadge = isDown ? 
+                                `<span class="badge bg-danger px-3 py-1">NOT AVAILABLE</span>` : 
+                                `<span class="badge bg-success px-3 py-1">AVAILABLE</span>`;
+                            const reasonEn = isDown ? isDown.reasonEn : "-";
+                            const reasonHi = isDown ? `<br><small class="text-muted font-monospace">${isDown.reasonHi}</small>` : "";
 
                             tableHTML += `
-                                        </tbody>
-                                    </table>
-                                </div>
+                                <tr class="${rowClass}">
+                                    <td>${index + 1}</td>
+                                    <td class="fw-semibold search-target">${test}</td>
+                                    <td class="text-center">${statusBadge}</td>
+                                    <td class="text-end fw-medium text-secondary">${reasonEn}${reasonHi}</td>
+                                </tr>
                             `;
-                            contentElement.innerHTML = tableHTML;
-                        }
+                        });
+
+                        tableHTML += `</tbody></table></div>`;
+                        contentArea.innerHTML = tableHTML;
                     }
                 })
                 .catch(error => {
-                    console.error(`Error loading data for ${facility.id}:`, error);
-                    badgeElement.className = "status-badge status-error";
-                    badgeElement.innerText = "Try Again Later";
-                    contentElement.innerHTML = `
-                        <div class="alert alert-danger border-0 m-0 py-3 text-center">
-                            <strong>❌ Connection Timeout</strong><br>
-                            Unable to pull modern status logs. Please verify internet configuration parameters or server assets.
-                        </div>
-                    `;
+                    badge.className = "status-badge status-error";
+                    badge.innerText = "Connection Error";
+                    contentArea.innerHTML = `
+                        <div class="alert alert-danger text-center border-0 py-4">
+                            <h4 class="fw-bold">❌ Try Again Later</h4>
+                            <p class="mb-0">Unable to load data sync rules. Please verify internet configuration rules or web app deployments.</p>
+                        </div>`;
                 });
         }
 
-        /**
-         * Helper utility to clean whitespace and special characters from elements IDs
-         */
-        function cleanId(string) {
-            return string.replace(/[^a-zA-Z0-9]/g, "");
+        // Live Test Filter Search Logic Engine
+        function filterTestTable() {
+            const query = document.getElementById("search-bar").value.toLowerCase().trim();
+            const table = document.getElementById("test-matrix-table");
+            if (!table) return; // Exit gracefully if table isn't rendered
+            
+            const rows = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
+            for (let i = 0; i < rows.length; i++) {
+                const testNameCell = rows[i].querySelector(".search-target");
+                if (testNameCell) {
+                    const textValue = testNameCell.textContent || testNameCell.innerText;
+                    if (textValue.toLowerCase().indexOf(query) > -1) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    </tr>";
+                    }
+                }
+            }
         }
     </script>
-    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
