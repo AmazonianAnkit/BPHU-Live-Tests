@@ -14,8 +14,10 @@
         .status-updated { background-color: #d1e7dd; color: #0f5132; }
         .status-pending { background-color: #fff3cd; color: #664d03; animation: pulse 2s infinite; }
         .status-error { background-color: #f8d7da; color: #842029; }
+        .counter-banner { background-color: #e8f0fe; color: #1a73e8; border-radius: 8px; font-weight: 600; font-size: 1.1rem; }
         .test-row-active { background-color: #ffffff; }
         .test-row-inactive { background-color: #fff5f5; }
+        .status-tag-text { font-size: 0.82rem; font-weight: 700; display: block; line-height: 1.2; }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
     </style>
 </head>
@@ -55,7 +57,7 @@
 
     <div class="container mb-5">
         <div class="status-card">
-            <div class="d-flex justify-content-between align-items-center flex-wrap pb-3 mb-4 border-bottom">
+            <div class="d-flex justify-content-between align-items-center flex-wrap pb-3 mb-3 border-bottom">
                 <h3 class="fw-bold m-0" id="display-facility-name">CHC Gosaiganj</h3>
                 <div id="display-status-badge" class="status-badge status-pending">Connecting...</div>
             </div>
@@ -132,6 +134,7 @@
                     // CASE B: Active Data Tracked Successfully
                     else if (data.systemStatus === "UPDATED") {
                         const totalExceptions = Object.keys(data).filter(k => k !== "systemStatus").length;
+                        const operationalCount = 73 - totalExceptions;
                         
                         if (totalExceptions === 0) {
                             badge.className = "status-badge status-updated";
@@ -141,16 +144,24 @@
                             badge.innerText = `${totalExceptions} Tests Inactive / जांच बाधित`;
                         }
 
-                        // Generate Structured 73-row Data Table
-                        let tableHTML = `
+                        // Generate Dynamic Available Tests Metric Banner
+                        let counterHTML = `
+                            <div class="p-3 mb-3 text-center counter-banner shadow-sm d-flex justify-content-around align-items-center flex-wrap">
+                                <span>📈 Available Tests / उपलब्ध जांचें: <span class="badge bg-success fs-6 ms-1">${operationalCount} / 73</span></span>
+                                <span>⚠️ Inactive Tests / बाधित जांचें: <span class="badge bg-danger fs-6 ms-1">${totalExceptions} / 73</span></span>
+                            </div>
+                        `;
+
+                        // Generate Structured Data Table with explicit bilingual statuses
+                        let tableHTML = counterHTML + `
                             <div class="table-responsive">
-                                <table class="table table-hover border align-middle mt-1" id="test-matrix-table">
+                                <table class="table table-hover border align-middle" id="test-matrix-table">
                                     <thead class="table-dark">
                                         <tr>
                                             <th style="width: 8%">Sl No.</th>
                                             <th style="width: 52%">Diagnostic Test Panel / जांच का नाम</th>
-                                            <th style="width: 15%" class="text-center">Status / स्थिति</th>
-                                            <th style="width: 25%" class="text-end">Reason / कारण (If Inactive)</th>
+                                            <th style="width: 18%" class="text-center">Status / स्थिति</th>
+                                            <th style="width: 22%" class="text-end">Reason / कारण (If Inactive)</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -159,11 +170,20 @@
                         MASTER_TEST_LIST.forEach((test, index) => {
                             const isDown = data[test];
                             const rowClass = isDown ? "test-row-inactive" : "test-row-active";
+                            
+                            // Setup localized dynamic labels explicitly for rows
                             const statusBadge = isDown ? 
-                                `<span class="badge bg-danger px-3 py-1">NOT AVAILABLE</span>` : 
-                                `<span class="badge bg-success px-3 py-1">AVAILABLE</span>`;
+                                `<div class="btn btn-sm btn-danger px-2 py-1 w-100 disabled text-white" style="opacity:1;">
+                                    <span class="status-tag-text">NOT AVAILABLE</span>
+                                    <span class="status-tag-text font-monospace" style="font-size:0.72rem;">अनुपलब्ध</span>
+                                 </div>` : 
+                                `<div class="btn btn-sm btn-success px-2 py-1 w-100 disabled text-white" style="opacity:1;">
+                                    <span class="status-tag-text">AVAILABLE</span>
+                                    <span class="status-tag-text font-monospace" style="font-size:0.72rem;">उपलब्ध</span>
+                                 </div>`;
+                                 
                             const reasonEn = isDown ? isDown.reasonEn : "-";
-                            const reasonHi = isDown ? `<br><small class="text-muted font-monospace">${isDown.reasonHi}</small>` : "";
+                            const reasonHi = isDown ? `<br><small class="text-muted font-monospace" style="font-size:0.78rem;">${isDown.reasonHi}</small>` : "";
 
                             tableHTML += `
                                 <tr class="${rowClass}">
