@@ -10,14 +10,14 @@
     "Total leucocyte count": {
       "statusEn": "NOT AVAILABLE",
       "statusHi": "उपलब्ध नहीं",
-      "reasonEn": "Equipment Breakdown",
-      "reasonHi": "मशीन खराब"
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
     },
     "Differential leucocyte count": {
       "statusEn": "NOT AVAILABLE",
       "statusHi": "उपलब्ध नहीं",
-      "reasonEn": "Both Reasons",
-      "reasonHi": "उपरोक्त दोनों कारण"
+      "reasonEn": "Reagent Out of Stock",
+      "reasonHi": "अभिकर्मक अनुपलब्ध"
     },
     "Platelet count": {
       "statusEn": "NOT AVAILABLE",
@@ -28,14 +28,14 @@
     "HCG urine test": {
       "statusEn": "NOT AVAILABLE",
       "statusHi": "उपलब्ध नहीं",
-      "reasonEn": "Reagent Out of Stock",
-      "reasonHi": "अभिकर्मक अनुपलब्ध"
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
     },
     "Urine routine test": {
       "statusEn": "NOT AVAILABLE",
       "statusHi": "उपलब्ध नहीं",
-      "reasonEn": "Reagent Out of Stock",
-      "reasonHi": "अभिकर्मक अनुपलब्ध"
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
     },
     "Urine microscopy": {
       "statusEn": "NOT AVAILABLE",
@@ -46,8 +46,8 @@
     "Urine for microalbumin": {
       "statusEn": "NOT AVAILABLE",
       "statusHi": "उपलब्ध नहीं",
-      "reasonEn": "Both Reasons",
-      "reasonHi": "उपरोक्त दोनों कारण"
+      "reasonEn": "Equipment Breakdown",
+      "reasonHi": "मशीन खराब"
     },
     "Dengue test": {
       "statusEn": "NOT AVAILABLE",
@@ -76,26 +76,26 @@
     "Blood sugar": {
       "statusEn": "NOT AVAILABLE",
       "statusHi": "उपलब्ध नहीं",
-      "reasonEn": "Reagent Out of Stock",
-      "reasonHi": "अभिकर्मक अनुपलब्ध"
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
     },
     "Glucose tolerance test (GTT)": {
       "statusEn": "NOT AVAILABLE",
       "statusHi": "उपलब्ध नहीं",
-      "reasonEn": "Reagent Out of Stock",
-      "reasonHi": "अभिकर्मक अनुपलब्ध"
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
     },
     "Total bilirubin": {
       "statusEn": "NOT AVAILABLE",
       "statusHi": "उपलब्ध नहीं",
-      "reasonEn": "Reagent Out of Stock",
-      "reasonHi": "अभिकर्मक अनुपलब्ध"
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
     },
     "Direct & indirect bilirubin": {
       "statusEn": "NOT AVAILABLE",
       "statusHi": "उपलब्ध नहीं",
-      "reasonEn": "Reagent Out of Stock",
-      "reasonHi": "अभिकर्मक अनुपलब्ध"
+      "reasonEn": "Both Reasons",
+      "reasonHi": "उपरोक्त दोनों कारण"
     },
     "Troponin I": {
       "statusEn": "NOT AVAILABLE",
